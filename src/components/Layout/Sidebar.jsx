@@ -21,7 +21,7 @@ const Sidebar = () => {
                     </Link>
                 </li>
                 <li>
-                    <Link to="/projects" className={isActive('/projects') ? 'active' : ''}>
+                    <Link to="/dashboard" className={isActive('/dashboard') ? 'active' : ''}>
                         <span className="sidebar-icon">📁</span>
                         Proyectos
                     </Link>
