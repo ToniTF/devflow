@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -12,7 +13,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyAw2gKwTiGdHmA7Y2sFLGGZXOvT0qBnV8c",
   authDomain: "devflow-6f814.firebaseapp.com",
   projectId: "devflow-6f814",
-  storageBucket: "devflow-6f814.firebasestorage.app",
+  storageBucket: "devflow-6f814.appspot.com",
   messagingSenderId: "1077279776175",
   appId: "1:1077279776175:web:42130f76034a93f45be35a",
   measurementId: "G-E1VTEJ7DJZ"
@@ -23,3 +24,4 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const storage = getStorage(app);

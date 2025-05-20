@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import ChatRoom from '../components/Chat/ChatRoom';
 import TaskManager from '../components/Tasks/TaskManager'; // Añadir esta importación
+import CloudinaryUploader from '../components/Files/CloudinaryUploader';
 import './ProjectPage.css';
 
 const ProjectPage = () => {
@@ -13,6 +14,7 @@ const ProjectPage = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filesUpdated, setFilesUpdated] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -39,6 +41,34 @@ const ProjectPage = () => {
 
   const isCollaborator = project?.collaborators?.includes(currentUser?.uid);
   const isOwner = project?.createdBy === currentUser?.uid;
+
+  const handleFileUploaded = (fileData) => {
+    setProject(prev => ({
+      ...prev,
+      files: [...(prev.files || []), fileData]
+    }));
+  };
+
+  // Función para eliminar archivos de Cloudinary
+  const handleDeleteFile = async (fileData) => {
+    if (window.confirm('¿Estás seguro de eliminar este archivo?')) {
+      try {
+        // Solo necesitamos actualizar Firestore, no Cloudinary
+        // (aunque es posible eliminar de Cloudinary con API firmada)
+        const projectRef = doc(db, "projects", id);
+        await updateDoc(projectRef, {
+          files: arrayRemove(fileData)
+        });
+        
+        setProject(prev => ({
+          ...prev,
+          files: prev.files.filter(f => f.id !== fileData.id)
+        }));
+      } catch (err) {
+        console.error('Error al eliminar archivo:', err);
+      }
+    }
+  };
 
   if (loading) return <div className="loading-container">Cargando proyecto...</div>;
   if (error) return <div className="error-container">{error}</div>;
@@ -80,12 +110,33 @@ const ProjectPage = () => {
       <div className="project-content">
         <div className="project-files">
           <h3>Archivos del proyecto</h3>
+          
+          {(isOwner || project.collaborators?.includes(currentUser?.uid)) && (
+            <CloudinaryUploader 
+              projectId={id} 
+              currentUser={currentUser} 
+              onFileUploaded={handleFileUploaded} 
+            />
+          )}
+          
           <div className="files-list">
             {project.files && project.files.length > 0 ? (
-              project.files.map((file, index) => (
-                <div key={index} className="file-item">
-                  <span className="file-name">{file.name}</span>
+              project.files.map((file) => (
+                <div key={file.id} className="file-item">
+                  <a href={file.url} target="_blank" rel="noopener noreferrer" className="file-link">
+                    <span className="file-name">{file.name}</span>
+                  </a>
                   <span className="file-size">{file.size} KB</span>
+                  
+                  {(isOwner || file.uploadedBy === currentUser?.uid) && (
+                    <button 
+                      className="btn-delete-file" 
+                      onClick={() => handleDeleteFile(file)}
+                      title="Eliminar archivo"
+                    >
+                      <i className="fas fa-trash"></i>
+                    </button>
+                  )}
                 </div>
               ))
             ) : (

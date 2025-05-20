@@ -12,48 +12,70 @@ const ChatRoom = ({ projectId }) => {
   const [users, setUsers] = useState({});
   const messagesEndRef = useRef(null);
 
-  // Cargar y escuchar mensajes en tiempo real
+  // 1. Efecto para cargar mensajes - se ejecuta solo cuando cambia projectId
   useEffect(() => {
-    if (!projectId) return;
+    let unsubscribe = null;
 
-    setLoading(true);
+    const setupListener = async () => {
+      if (!projectId) return;
 
-    // Escuchar nuevos mensajes
-    const unsubscribe = listenToMessages(projectId, (updatedMessages) => {
-      setMessages(updatedMessages);
-      setLoading(false);
-    });
+      try {
+        setLoading(true);
+        unsubscribe = listenToMessages(projectId, (updatedMessages) => {
+          setMessages(updatedMessages);
+          setLoading(false);
+        });
+      } catch (error) {
+        console.error("Error al escuchar mensajes:", error);
+        setLoading(false);
+      }
+    };
 
-    // Cleanup al desmontar
-    return () => unsubscribe();
+    setupListener();
+
+    return () => {
+      if (unsubscribe && typeof unsubscribe === "function") {
+        unsubscribe();
+      }
+    };
   }, [projectId]);
 
-  // Cargar información de los usuarios que enviaron mensajes
+  // 2. Efecto para cargar datos de usuarios - separado del efecto de mensajes
   useEffect(() => {
-    const loadUsers = async () => {
-      const uniqueUserIds = [...new Set(messages.map((msg) => msg.sender))];
+    if (!messages.length) return;
 
-      const usersData = {};
-      for (const userId of uniqueUserIds) {
-        if (!users[userId]) {
+    const fetchUsers = async () => {
+      const uniqueUserIds = [...new Set(messages.map((msg) => msg.sender))];
+      const usersToLoad = uniqueUserIds.filter((userId) => !users[userId]);
+
+      if (!usersToLoad.length) return;
+
+      const newUsers = {};
+      for (const userId of usersToLoad) {
+        try {
           const userData = await getUserById(userId);
-          usersData[userId] = userData;
+          if (userData) {
+            newUsers[userId] = userData;
+          }
+        } catch (error) {
+          console.error(`Error al cargar usuario ${userId}:`, error);
         }
       }
 
-      setUsers((prev) => ({ ...prev, ...usersData }));
+      if (Object.keys(newUsers).length > 0) {
+        setUsers((prev) => ({ ...prev, ...newUsers }));
+      }
     };
 
-    if (messages.length > 0) {
-      loadUsers();
-    }
-  }, [messages, users]);
+    fetchUsers();
+  }, [messages]);
 
-  // Auto-scroll al último mensaje
+  // 3. Efecto para scroll automático
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Manejador de envío de mensajes
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || !currentUser) return;
