@@ -1,39 +1,81 @@
 import { useState, useEffect } from 'react';
-import { db } from '../firebase/firestore'; // Asegúrate de que la ruta sea correcta
-import { collection, getDocs, addDoc } from 'firebase/firestore';
+import { firestore } from '../firebase/firestore';
+import {
+  getProjects,
+  getProjectById,
+  createProject,
+  updateProject,
+  deleteProject
+} from '../firebase/firestore';
 
-const useProjects = () => {
-    const [projects, setProjects] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+export const useProjects = (userId = null) => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const projectsCollection = collection(db, 'projects');
-                const projectSnapshot = await getDocs(projectsCollection);
-                const projectList = projectSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setProjects(projectList);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProjects();
-    }, []);
-
-    const addProject = async (project) => {
-        try {
-            const docRef = await addDoc(collection(db, 'projects'), project);
-            setProjects(prevProjects => [...prevProjects, { id: docRef.id, ...project }]);
-        } catch (err) {
-            setError(err.message);
-        }
+  // Cargar todos los proyectos o solo los del usuario actual
+  useEffect(() => {
+    const loadProjects = async () => {
+      try {
+        setLoading(true);
+        const projectsData = await getProjects(userId);
+        setProjects(projectsData);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error al cargar proyectos:", err);
+        setError("No se pudieron cargar los proyectos");
+        setLoading(false);
+      }
     };
 
-    return { projects, loading, error, addProject };
-};
+    loadProjects();
+  }, [userId]);
 
-export default useProjects;
+  // Funciones para manipular proyectos
+  const addProject = async (projectData, currentUserId) => {
+    try {
+      const newProject = await createProject(projectData, currentUserId);
+      setProjects(prev => [newProject, ...prev]);
+      return newProject;
+    } catch (err) {
+      setError("No se pudo crear el proyecto");
+      throw err;
+    }
+  };
+
+  const editProject = async (projectId, projectData) => {
+    try {
+      const updatedProject = await updateProject(projectId, projectData);
+      setProjects(prev => 
+        prev.map(project => project.id === projectId 
+          ? { ...project, ...updatedProject } 
+          : project
+        )
+      );
+      return updatedProject;
+    } catch (err) {
+      setError("No se pudo actualizar el proyecto");
+      throw err;
+    }
+  };
+
+  const removeProject = async (projectId) => {
+    try {
+      await deleteProject(projectId);
+      setProjects(prev => prev.filter(project => project.id !== projectId));
+      return true;
+    } catch (err) {
+      setError("No se pudo eliminar el proyecto");
+      throw err;
+    }
+  };
+
+  return {
+    projects,
+    loading,
+    error,
+    addProject,
+    editProject,
+    removeProject
+  };
+};

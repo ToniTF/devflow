@@ -1,31 +1,43 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import { firebaseConfig } from './config';
+import { 
+  getAuth, 
+  signInWithPopup, 
+  GithubAuthProvider, 
+  signOut,
+  onAuthStateChanged 
+} from 'firebase/auth';
+import { app } from './config';
 
-firebase.initializeApp(firebaseConfig);
+// Obtener la instancia de autenticación
+const auth = getAuth(app);
+const githubProvider = new GithubAuthProvider();
 
-const auth = firebase.auth();
-
+// Iniciar sesión con GitHub
 export const signInWithGithub = async () => {
-    const provider = new firebase.auth.GithubAuthProvider();
-    try {
-        const result = await auth.signInWithPopup(provider);
-        return result.user;
-    } catch (error) {
-        console.error("Error during GitHub authentication:", error);
-        throw error;
-    }
+  try {
+    const result = await signInWithPopup(auth, githubProvider);
+    // Añadir scopes adicionales para acceder a repositorios si es necesario
+    // githubProvider.addScope('repo');
+    return result.user;
+  } catch (error) {
+    console.error("Error al autenticar con GitHub:", error);
+    throw error;
+  }
 };
 
-export const signOut = async () => {
-    try {
-        await auth.signOut();
-    } catch (error) {
-        console.error("Error signing out:", error);
-        throw error;
-    }
+// Cerrar sesión
+export const logOut = async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    throw error;
+  }
 };
 
-export const onAuthStateChanged = (callback) => {
-    return auth.onAuthStateChanged(callback);
+// Observador de cambio de estado de autenticación
+export const onAuthChange = (callback) => {
+  return onAuthStateChanged(auth, callback);
 };
+
+// Exportar instancia de autenticación
+export { auth };
