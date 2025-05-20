@@ -64,7 +64,8 @@ export const ProjectProvider = ({ children }) => {
         loading,
         addProject,
         updateProject,
-        deleteProject 
+        deleteProject,
+        updateProjectInList
       }}
     >
       {children}

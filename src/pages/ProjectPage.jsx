@@ -52,7 +52,12 @@ const ProjectPage = () => {
           <h1>{project.name}</h1>
           {isOwner && (
             <div className="project-actions">
-              <button className="btn btn-secondary">Editar</button>
+              <button 
+                className="btn btn-secondary"
+                onClick={() => history.push(`/project/edit/${id}`)}
+              >
+                Editar
+              </button>
             </div>
           )}
         </div>
