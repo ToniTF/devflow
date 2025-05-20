@@ -3,7 +3,7 @@ import { AuthContext } from '../context/AuthContext';
 import { 
   signInWithGithub, 
   logOut, 
-  onAuthChange 
+  saveUserData 
 } from '../firebase/auth';
 
 export const useAuth = () => {
@@ -16,10 +16,14 @@ export const useAuth = () => {
     try {
       setLoading(true);
       setError(null);
-      await signInWithGithub();
+      const user = await signInWithGithub();
+      // Aquí está la llamada a saveUserData después de autenticación exitosa
+      await saveUserData(user);
+      return user;
     } catch (err) {
       console.error("Error en el inicio de sesión:", err);
       setError("No se pudo iniciar sesión con GitHub");
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -29,7 +33,6 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       setLoading(true);
-      setError(null);
       await logOut();
     } catch (err) {
       console.error("Error al cerrar sesión:", err);

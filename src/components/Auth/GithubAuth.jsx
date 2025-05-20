@@ -1,24 +1,29 @@
-import React from 'react';
-import { auth, provider } from '../../firebase/auth'; // Asegúrate de que la ruta sea correcta
+import React, { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 const GithubAuth = () => {
-    const { login } = useAuth();
+    const { login, loading, error } = useAuth();
+    const [localError, setLocalError] = useState('');
 
     const handleGithubLogin = async () => {
         try {
-            const result = await auth.signInWithPopup(provider);
-            const user = result.user;
-            login(user);
+            // Usa la función login del hook useAuth que ya incluye saveUserData
+            await login();
         } catch (error) {
-            console.error("Error during GitHub login:", error);
+            setLocalError("Error al iniciar sesión con GitHub");
+            console.error("Error durante el login con GitHub:", error);
         }
     };
 
     return (
-        <div>
-            <button onClick={handleGithubLogin}>
-                Iniciar sesión con GitHub
+        <div className="github-auth-container">
+            {localError && <p className="error">{localError}</p>}
+            <button 
+                className="github-button"
+                onClick={handleGithubLogin}
+                disabled={loading}
+            >
+                {loading ? 'Procesando...' : 'Iniciar sesión con GitHub'}
             </button>
         </div>
     );

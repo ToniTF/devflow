@@ -18,14 +18,18 @@ const App = () => {
             <ProjectProvider>
                 <Router>
                     <Navbar />
-                    <Sidebar />
-                    <Switch>
-                        <Route path="/" exact component={Home} />
-                        <Route path="/dashboard" component={Dashboard} />
-                        <Route path="/project/:id" component={ProjectPage} />
-                        <Route path="/profile" component={Profile} />
-                        <Route path="/login" component={Login} />
-                    </Switch>
+                    <div className="app-container">
+                        <Sidebar />
+                        <main className="main-content">
+                            <Switch>
+                                <Route path="/" exact component={Home} />
+                                <Route path="/dashboard" component={Dashboard} />
+                                <Route path="/project/:id" component={ProjectPage} />
+                                <Route path="/profile" component={Profile} />
+                                <Route path="/login" component={Login} />
+                            </Switch>
+                        </main>
+                    </div>
                     <Footer />
                 </Router>
             </ProjectProvider>
