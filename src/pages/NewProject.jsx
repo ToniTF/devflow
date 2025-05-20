@@ -18,6 +18,7 @@ const NewProject = () => {
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [isPublic, setIsPublic] = useState(false); // Nuevo estado para público/privado
 
     // Redirigir si no hay usuario autenticado
     if (!currentUser) {
@@ -40,14 +41,15 @@ const NewProject = () => {
 
         try {
             const projectData = {
-                name: formData.name,
-                description: formData.description,
+                name: formData.name.trim(),
+                description: formData.description.trim(),
                 repositoryUrl: formData.repositoryUrl,
                 tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
                 createdBy: currentUser.uid,
                 collaborators: [currentUser.uid],
                 createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
+                updatedAt: serverTimestamp(),
+                isPublic: isPublic // Incluir el valor seleccionado por el usuario
             };
 
             // Guardar en Firestore
@@ -121,6 +123,22 @@ const NewProject = () => {
                         onChange={handleChange}
                         placeholder="Ej. react, javascript, firebase"
                     />
+                </div>
+                
+                <div className="form-group">
+                    <label className="privacy-label">
+                        <input
+                            type="checkbox"
+                            checked={isPublic}
+                            onChange={(e) => setIsPublic(e.target.checked)}
+                            className="privacy-checkbox"
+                        />
+                        <span>Hacer este proyecto público (visible para todos)</span>
+                    </label>
+                    <p className="privacy-hint">
+                        Los proyectos públicos aparecen en la página principal y pueden ser vistos por cualquier persona.
+                        Los proyectos privados solo son visibles para ti y tus colaboradores.
+                    </p>
                 </div>
                 
                 <div className="form-actions">

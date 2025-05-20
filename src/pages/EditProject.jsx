@@ -18,6 +18,7 @@ const EditProject = () => {
         repositoryUrl: '',
         tags: ''
     });
+    const [isPublic, setIsPublic] = useState(false);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState(null);
@@ -44,6 +45,7 @@ const EditProject = () => {
                         repositoryUrl: projectData.repositoryUrl || '',
                         tags: projectData.tags?.join(', ') || ''
                     });
+                    setIsPublic(projectData.isPublic || false);
                 } else {
                     setError('Proyecto no encontrado');
                 }
@@ -85,8 +87,9 @@ const EditProject = () => {
             const projectRef = doc(db, 'projects', id);
             
             const updatedData = {
-                name: formData.name,
-                description: formData.description,
+                name: formData.name.trim(),
+                description: formData.description.trim(),
+                isPublic: isPublic,
                 repositoryUrl: formData.repositoryUrl,
                 tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag),
                 updatedAt: serverTimestamp()
@@ -174,6 +177,17 @@ const EditProject = () => {
                         onChange={handleChange}
                         placeholder="Ej. react, javascript, firebase"
                     />
+                </div>
+
+                <div className="form-group">
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={isPublic}
+                            onChange={() => setIsPublic(prev => !prev)}
+                        />
+                        Hacer proyecto público
+                    </label>
                 </div>
                 
                 <div className="form-actions">

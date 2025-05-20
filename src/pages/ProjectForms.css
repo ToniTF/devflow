@@ -1,0 +1,20 @@
+/* O donde tengas los estilos del formulario */
+
+.privacy-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.privacy-checkbox {
+  margin-right: 0.75rem;
+  width: 18px;
+  height: 18px;
+}
+
+.privacy-hint {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
