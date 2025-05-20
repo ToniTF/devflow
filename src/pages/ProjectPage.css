@@ -1,8 +1,9 @@
 .project-detail-container {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   min-height: calc(100vh - 160px);
+  overflow-x: hidden;
 }
 
 .project-header {
@@ -32,9 +33,29 @@
 }
 
 .project-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 2rem;
+  max-width: 100%;
+}
+
+/* Para pantallas más grandes, mostrar contenido en columnas */
+@media (min-width: 992px) {
+  .project-content {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .project-files,
+  .project-chat {
+    flex: 1;
+    min-width: 300px;
+    max-width: calc(50% - 1rem);
+  }
+  
+  .project-tasks-section {
+    width: 100%;
+  }
 }
 
 .project-files, .project-chat {
@@ -69,6 +90,21 @@
 
 .error-container {
   color: #c62828;
+}
+
+/* Asegurar que elementos como tablas y listas no se desborden */
+.project-detail-container table,
+.project-detail-container img,
+.files-list,
+.chat-container {
+  max-width: 100%;
+}
+
+/* Ajustar el componente de tareas */
+.tasks-board {
+  max-width: 100%;
+  overflow-x: auto; /* Permitir scroll horizontal solo en el tablero de tareas */
+  padding-bottom: 10px; /* Espacio para el scrollbar */
 }
 
 @media (max-width: 768px) {

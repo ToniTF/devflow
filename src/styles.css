@@ -77,19 +77,23 @@ a:hover {
 
 .app-container {
   display: flex;
-  min-height: calc(100vh - 60px); /* Ajusta según la altura de tu navbar y footer */
+  min-height: calc(100vh - 60px);
 }
 
 .main-content {
   flex: 1;
-  margin-left: 250px; /* Mismo ancho que el sidebar */
+  margin-left: 200px; /* Actualizar este valor para que coincida con el ancho del sidebar */
   padding: 20px;
   margin-top: 60px; /* Altura de la navbar */
+  max-width: calc(100vw - 200px); /* Asegurar que no exceda el ancho disponible */
+  overflow-x: hidden; /* Evitar scroll horizontal */
+  box-sizing: border-box; /* Incluir padding en el ancho */
 }
 
 /* Estilos responsive */
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0; /* En dispositivos móviles, el sidebar estará oculto */
+    max-width: 100vw;
   }
 }

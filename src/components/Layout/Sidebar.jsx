@@ -12,7 +12,7 @@ const Sidebar = () => {
 
     return (
         <div className="sidebar">
-            <h2>DevFlow</h2>
+            
             <ul>
                 <li>
                     <Link to="/dashboard" className={isActive('/dashboard') ? 'active' : ''}>

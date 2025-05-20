@@ -5,6 +5,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
+  max-width: 100%;
 }
 
 .chat-messages {

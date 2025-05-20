@@ -12,6 +12,12 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+#app_name {
+  color: #007bff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
 .navbar-logo {
   display: flex;
   align-items: center;

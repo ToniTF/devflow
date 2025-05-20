@@ -4,6 +4,7 @@ import { AuthContext } from '../context/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import ChatRoom from '../components/Chat/ChatRoom';
+import TaskManager from '../components/Tasks/TaskManager'; // Añadir esta importación
 import './ProjectPage.css';
 
 const ProjectPage = () => {
@@ -97,6 +98,16 @@ const ProjectPage = () => {
           <h3>Chat del proyecto</h3>
           <ChatRoom projectId={id} />
         </div>
+
+        {project && (
+          <div className="project-tasks-section">
+            <TaskManager 
+              projectId={id}
+              collaborators={project.collaborators || []}
+              isOwner={project.createdBy === currentUser?.uid}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
