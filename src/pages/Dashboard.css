@@ -64,9 +64,64 @@
 }
 
 .project-meta {
-  font-size: 0.9rem;
-  color: #666;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.project-creator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.project-description {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.project-collaborators {
+  margin-top: 0.5rem;
+}
+
+.project-collaborators h4 {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.collaborators-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.collaborator-tag {
+  background-color: #e1f5fe;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #0277bd;
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.project-tag {
+  background-color: #f0f0f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #555;
 }
 
 .no-projects {

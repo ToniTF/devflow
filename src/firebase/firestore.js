@@ -87,5 +87,29 @@ export const deleteProject = async (projectId) => {
   }
 };
 
+// Función para obtener datos de un usuario por su ID
+export const getUserById = async (userId) => {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      
+      // Priorizar el nombre de usuario de GitHub
+      return { 
+        id: userDoc.id, 
+        ...userData,
+        // Usar preferentemente el nombre de usuario de GitHub
+        displayName: userData.githubUsername || userData.displayName || 'Usuario sin nombre'
+      };
+    } else {
+      console.log(`Usuario con ID ${userId} no encontrado`);
+      return { displayName: 'Usuario desconocido' };
+    }
+  } catch (error) {
+    console.error('Error al obtener datos de usuario:', error);
+    return { displayName: 'Usuario desconocido' };
+  }
+};
+
 // Exporta la referencia a la base de datos
 export { db as firestore };
