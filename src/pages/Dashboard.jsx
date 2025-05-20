@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ProjectContext } from '../context/ProjectContext';
-import { getUserById } from '../firebase/firestore';
+import { getUserById, addCollaboratorToProject } from '../firebase/firestore';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -11,7 +11,8 @@ const Dashboard = () => {
   const [filter, setFilter] = useState('all');
   const [usersData, setUsersData] = useState({});
   const [loadingUsers, setLoadingUsers] = useState(false);
-
+  const [joinStatus, setJoinStatus] = useState({});
+  
   // Filtrar proyectos según la selección
   const filteredProjects = filter === 'all' 
     ? projects 
@@ -47,6 +48,72 @@ const Dashboard = () => {
     
     fetchUsersData();
   }, [projects]);
+
+  // Función para unirse a un proyecto
+  const handleJoinProject = async (projectId) => {
+    if (!currentUser) return;
+    
+    setJoinStatus(prev => ({
+      ...prev,
+      [projectId]: { loading: true, message: '', error: false }
+    }));
+    
+    try {
+      const result = await addCollaboratorToProject(projectId, currentUser.uid);
+      
+      if (result.success) {
+        // Actualizar el estado local del proyecto para reflejar el nuevo colaborador
+        const updatedProjects = projects.map(project => {
+          if (project.id === projectId) {
+            return {
+              ...project,
+              collaborators: [...(project.collaborators || []), currentUser.uid]
+            };
+          }
+          return project;
+        });
+        
+        // Actualizar el contexto (esto dependerá de tu implementación)
+        // updateProjects(updatedProjects);
+        
+        setJoinStatus(prev => ({
+          ...prev,
+          [projectId]: { 
+            loading: false, 
+            message: result.message,
+            success: true,
+            error: false 
+          }
+        }));
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error("Error al unirse al proyecto:", error);
+      setJoinStatus(prev => ({
+        ...prev,
+        [projectId]: { 
+          loading: false, 
+          message: error.message || 'Error al unirse al proyecto',
+          error: true,
+          success: false
+        }
+      }));
+    }
+  };
+
+  // Determinar si el usuario puede unirse al proyecto
+  const canJoinProject = (project) => {
+    if (!currentUser) return false;
+    
+    // No puede unirse si es el creador
+    if (project.createdBy === currentUser.uid) return false;
+    
+    // No puede unirse si ya es colaborador
+    if (project.collaborators?.includes(currentUser.uid)) return false;
+    
+    return true;
+  };
 
   if (!currentUser) {
     return (
@@ -133,9 +200,28 @@ const Dashboard = () => {
                   ))}
                 </div>
                 
-                <Link to={`/project/${project.id}`} className="btn btn-secondary">
-                  Ver Proyecto
-                </Link>
+                <div className="project-actions">
+                  <Link to={`/project/${project.id}`} className="btn btn-secondary">
+                    Ver Proyecto
+                  </Link>
+                  
+                  {canJoinProject(project) && (
+                    <button 
+                      className={`btn ${joinStatus[project.id]?.success ? 'btn-success' : 'btn-primary'}`}
+                      onClick={() => handleJoinProject(project.id)}
+                      disabled={joinStatus[project.id]?.loading}
+                    >
+                      {joinStatus[project.id]?.loading ? 'Uniéndose...' : 
+                       joinStatus[project.id]?.success ? 'Unido' : 'Unirse'}
+                    </button>
+                  )}
+                </div>
+                
+                {joinStatus[project.id]?.message && (
+                  <div className={`join-message ${joinStatus[project.id]?.error ? 'error' : 'success'}`}>
+                    {joinStatus[project.id].message}
+                  </div>
+                )}
               </div>
             ))
           ) : (

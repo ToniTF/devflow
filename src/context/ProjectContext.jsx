@@ -49,6 +49,14 @@ export const ProjectProvider = ({ children }) => {
     setProjects(prev => prev.filter(project => project.id !== projectId));
   };
   
+  const updateProjectInList = (updatedProject) => {
+    setProjects(prevProjects => 
+      prevProjects.map(project => 
+        project.id === updatedProject.id ? updatedProject : project
+      )
+    );
+  };
+  
   return (
     <ProjectContext.Provider 
       value={{ 

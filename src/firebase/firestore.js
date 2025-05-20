@@ -111,5 +111,44 @@ export const getUserById = async (userId) => {
   }
 };
 
+// Función para añadir un colaborador a un proyecto
+export const addCollaboratorToProject = async (projectId, userId) => {
+  try {
+    const projectRef = doc(projectsCollection, projectId);
+    const projectDoc = await getDoc(projectRef);
+    
+    if (!projectDoc.exists()) {
+      throw new Error('Proyecto no encontrado');
+    }
+    
+    const projectData = projectDoc.data();
+    const collaborators = projectData.collaborators || [];
+    
+    // Verificar si el usuario ya es colaborador
+    if (collaborators.includes(userId)) {
+      return { success: true, message: 'Ya eres colaborador de este proyecto' };
+    }
+    
+    // Añadir el usuario a la lista de colaboradores
+    collaborators.push(userId);
+    
+    await updateDoc(projectRef, {
+      collaborators: collaborators,
+      updatedAt: serverTimestamp()
+    });
+    
+    return { 
+      success: true, 
+      message: 'Te has unido al proyecto exitosamente' 
+    };
+  } catch (error) {
+    console.error(`Error al añadir colaborador al proyecto ${projectId}:`, error);
+    return { 
+      success: false, 
+      message: 'No se pudo unir al proyecto. Inténtalo de nuevo.' 
+    };
+  }
+};
+
 // Exporta la referencia a la base de datos
 export { db as firestore };
