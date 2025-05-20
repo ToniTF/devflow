@@ -2,7 +2,8 @@ import React, { useContext } from 'react';
 import { Redirect } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { useAuth } from '../hooks/useAuth';
-import githubLogo from '../assets/github-logo.png'; // Necesitarás añadir esta imagen
+// Elimina la importación del logo local
+// import githubLogo from '../assets/github-logo.png';
 import './Login.css';
 
 const Login = () => {
@@ -18,7 +19,6 @@ const Login = () => {
     try {
       await login();
     } catch (err) {
-      // El error ya se maneja en el hook useAuth
       console.error('Error en página de login:', err);
     }
   };
@@ -40,7 +40,12 @@ const Login = () => {
             'Iniciando sesión...'
           ) : (
             <>
-              <img src={githubLogo} alt="GitHub Logo" className="github-logo" />
+              {/* Usar URL externa en lugar de imagen local */}
+              <img 
+                src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" 
+                alt="GitHub Logo" 
+                className="github-logo" 
+              />
               Iniciar sesión con GitHub
             </>
           )}

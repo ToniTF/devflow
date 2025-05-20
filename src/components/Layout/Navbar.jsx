@@ -1,26 +1,45 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import './Navbar.css'; // Assuming you have a CSS file for styling
+import { AuthContext } from '../../context/AuthContext';
+import './Navbar.css';
 
 const Navbar = () => {
+    const { currentUser } = useContext(AuthContext);
+
     return (
         <nav className="navbar">
-            <div className="navbar-brand">
-                <Link to="/">DevFlow</Link>
+            <div className="navbar-logo">
+                <Link to="/">
+                    <h1>DevFlow</h1>
+                </Link>
             </div>
-            <ul className="navbar-links">
-                <li>
-                    <Link to="/projects">Projects</Link>
-                </li>
-                <li>
-                    <Link to="/dashboard">Dashboard</Link>
-                </li>
-                <li>
-                    <Link to="/profile">Profile</Link>
-                </li>
-            </ul>
-            <div className="navbar-auth">
-                <Link to="/login">Login</Link>
+            
+            <div className="navbar-links">
+                <Link to="/dashboard" className="nav-link">
+                    Proyectos
+                </Link>
+                
+                {currentUser ? (
+                    <>
+                        <Link to="/dashboard" className="nav-link">
+                            Dashboard
+                        </Link>
+                        <Link to="/profile" className="nav-link">
+                            Perfil
+                        </Link>
+                        <div className="user-menu">
+                            <img 
+                                src={currentUser.photoURL || 'https://via.placeholder.com/35'} 
+                                alt="Avatar" 
+                                className="user-avatar" 
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <Link to="/login" className="nav-link auth-button">
+                        Acceder con GitHub
+                    </Link>
+                )}
             </div>
         </nav>
     );

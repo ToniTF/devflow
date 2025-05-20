@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ProjectPage from './pages/ProjectPage';
 import Profile from './pages/Profile';
+import Login from './pages/Login';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
@@ -23,6 +24,7 @@ const App = () => {
                         <Route path="/dashboard" component={Dashboard} />
                         <Route path="/project/:id" component={ProjectPage} />
                         <Route path="/profile" component={Profile} />
+                        <Route path="/login" component={Login} />
                     </Switch>
                     <Footer />
                 </Router>
