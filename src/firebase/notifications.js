@@ -257,3 +257,146 @@ export const rejectProjectInvitation = async (notificationId, userId) => {
     throw error;
   }
 };
+
+// Solicitar unirse a un proyecto
+export const requestJoinProject = async (projectId, projectName, ownerId, requesterId, requesterName) => {
+  try {
+    // Crear notificación para el dueño del proyecto
+    await createNotification({
+      type: 'join_request',
+      recipientId: ownerId,
+      senderId: requesterId,
+      title: 'Solicitud para unirse a proyecto',
+      message: `${requesterName} ha solicitado unirse a tu proyecto "${projectName}"`,
+      data: {
+        projectId,
+        projectName,
+        requesterId,
+        requesterName
+      },
+      actions: [
+        {
+          label: 'Aceptar',
+          type: 'accept_join_request'
+        },
+        {
+          label: 'Rechazar',
+          type: 'reject_join_request'
+        }
+      ]
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error al solicitar unirse al proyecto:', error);
+    throw error;
+  }
+};
+
+// Aceptar solicitud de unión al proyecto
+export const acceptJoinRequest = async (notificationId) => {
+  try {
+    // 1. Obtener la notificación
+    const notificationRef = doc(db, 'notifications', notificationId);
+    const notificationDoc = await getDoc(notificationRef);
+    
+    if (!notificationDoc.exists()) {
+      throw new Error('Notificación no encontrada');
+    }
+    
+    const notification = {
+      id: notificationDoc.id,
+      ...notificationDoc.data()
+    };
+    
+    // 2. Verificar que sea una solicitud de unión
+    if (notification.type !== 'join_request') {
+      throw new Error('Esta notificación no es una solicitud de unión');
+    }
+    
+    const { projectId, projectName, requesterId, requesterName } = notification.data;
+    
+    // 3. Añadir al usuario como colaborador
+    const projectRef = doc(db, 'projects', projectId);
+    await updateDoc(projectRef, {
+      collaborators: arrayUnion(requesterId)
+    });
+    
+    // 4. Actualizar la notificación para indicar que ha sido aceptada
+    await updateDoc(notificationRef, {
+      read: true,
+      processed: true,
+      status: 'accepted',
+      processedAt: serverTimestamp()
+    });
+    
+    // 5. Crear notificación para el solicitante
+    await createNotification({
+      type: 'join_request_accepted',
+      recipientId: requesterId,
+      senderId: notification.recipientId,
+      title: 'Solicitud aceptada',
+      message: `Tu solicitud para unirte al proyecto "${projectName}" ha sido aceptada`,
+      data: {
+        projectId,
+        projectName
+      }
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error al aceptar solicitud de unión:', error);
+    throw error;
+  }
+};
+
+// Rechazar solicitud de unión al proyecto
+export const rejectJoinRequest = async (notificationId) => {
+  try {
+    // 1. Obtener la notificación
+    const notificationRef = doc(db, 'notifications', notificationId);
+    const notificationDoc = await getDoc(notificationRef);
+    
+    if (!notificationDoc.exists()) {
+      throw new Error('Notificación no encontrada');
+    }
+    
+    const notification = {
+      id: notificationDoc.id,
+      ...notificationDoc.data()
+    };
+    
+    // 2. Verificar que sea una solicitud de unión
+    if (notification.type !== 'join_request') {
+      throw new Error('Esta notificación no es una solicitud de unión');
+    }
+    
+    const { projectId, projectName, requesterId } = notification.data;
+    
+    // 3. Actualizar la notificación para indicar que ha sido rechazada
+    await updateDoc(notificationRef, {
+      read: true,
+      processed: true,
+      status: 'rejected',
+      processedAt: serverTimestamp()
+    });
+    
+    // 4. Crear notificación para el solicitante
+    await createNotification({
+      type: 'join_request_rejected',
+      recipientId: requesterId,
+      senderId: notification.recipientId,
+      title: 'Solicitud rechazada',
+      message: `Tu solicitud para unirte al proyecto "${projectName}" ha sido rechazada`,
+      data: {
+        projectId,
+        projectName
+      }
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Error al rechazar solicitud de unión:', error);
+    throw error;
+  }
+};

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { getNotifications, markAsRead, acceptProjectInvitation, rejectProjectInvitation } from '../firebase/notifications';
+import { getNotifications, markAsRead, acceptProjectInvitation, rejectProjectInvitation, acceptJoinRequest, rejectJoinRequest } from '../firebase/notifications';
 import './NotificationsPage.css';
 
 const NotificationsPage = () => {
@@ -61,6 +61,32 @@ const NotificationsPage = () => {
     }
   };
 
+  const handleAcceptJoinRequest = async (notification) => {
+    if (processing[notification.id]) return;
+    
+    try {
+      setProcessing(prev => ({ ...prev, [notification.id]: true }));
+      await acceptJoinRequest(notification.id);
+    } catch (error) {
+      console.error('Error al aceptar solicitud de unión:', error);
+    } finally {
+      setProcessing(prev => ({ ...prev, [notification.id]: false }));
+    }
+  };
+
+  const handleRejectJoinRequest = async (notification) => {
+    if (processing[notification.id]) return;
+    
+    try {
+      setProcessing(prev => ({ ...prev, [notification.id]: true }));
+      await rejectJoinRequest(notification.id);
+    } catch (error) {
+      console.error('Error al rechazar solicitud de unión:', error);
+    } finally {
+      setProcessing(prev => ({ ...prev, [notification.id]: false }));
+    }
+  };
+
   // Renderizar cada notificación según su tipo
   const renderNotification = (notification) => {
     const isUnread = !notification.read;
@@ -109,6 +135,26 @@ const NotificationsPage = () => {
             <button 
               className="btn-reject"
               onClick={() => handleRejectInvitation(notification)}
+              disabled={isProcessing}
+            >
+              {isProcessing ? 'Procesando...' : 'Rechazar'}
+            </button>
+          </div>
+        )}
+
+        {/* Botones para solicitudes de unión al proyecto */}
+        {notification.type === 'join_request' && !notification.processed && (
+          <div className="notification-actions">
+            <button 
+              className="btn-accept"
+              onClick={() => handleAcceptJoinRequest(notification)}
+              disabled={isProcessing}
+            >
+              {isProcessing ? 'Procesando...' : 'Aceptar'}
+            </button>
+            <button 
+              className="btn-reject"
+              onClick={() => handleRejectJoinRequest(notification)}
               disabled={isProcessing}
             >
               {isProcessing ? 'Procesando...' : 'Rechazar'}

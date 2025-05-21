@@ -1,73 +1,152 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import './ProjectCard.css'; // Asegúrate de crear este archivo si no existe
+import { AuthContext } from '../../context/AuthContext';
+import { getUserWithGitHubData } from '../../firebase/users';
+import { requestJoinProject } from '../../firebase/notifications';
+import './ProjectCard.css';
 
-const ProjectCard = ({ project, isOwner, showInviteButton, onInviteCollaborator }) => {
-    const handleInviteClick = (e) => {
-        e.stopPropagation(); // Evita que se dispare el onClick del Link
-        onInviteCollaborator(project.id);
-    };
-
-    // Función para procesar las etiquetas (maneja tanto strings como arrays)
-    const renderTags = () => {
-        // Si no hay etiquetas, no renderizamos nada
-        if (!project.tags) return null;
-        
-        // Convertimos las etiquetas a un array
-        let tagsArray = [];
-        
-        if (typeof project.tags === 'string') {
-            // Si es un string, dividimos por comas y eliminamos espacios en blanco
-            tagsArray = project.tags.split(',').map(tag => tag.trim()).filter(tag => tag);
-        } else if (Array.isArray(project.tags)) {
-            // Si ya es un array, lo usamos directamente
-            tagsArray = project.tags;
+const ProjectCard = ({ project, onInviteClick }) => {
+  const [creator, setCreator] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState(false);
+  const [joinRequestSent, setJoinRequestSent] = useState(false);
+  const { currentUser } = useContext(AuthContext);
+  
+  // Verificar si el usuario actual es el creador
+  const isCreator = currentUser && project.createdBy === currentUser.uid;
+  
+  // Verificar si el usuario actual ya es colaborador
+  const isCollaborator = currentUser && 
+                         project.collaborators && 
+                         project.collaborators.includes(currentUser.uid);
+  
+  // Obtener información del creador cuando se carga el componente
+  useEffect(() => {
+    const fetchCreator = async () => {
+      if (project.createdBy) {
+        try {
+          const userData = await getUserWithGitHubData(project.createdBy);
+          setCreator(userData);
+        } catch (error) {
+          console.error('Error al obtener datos del creador:', error);
+        } finally {
+          setLoading(false);
         }
-        
-        // Si no hay etiquetas después del procesamiento, no mostramos nada
-        if (tagsArray.length === 0) return null;
-        
-        return (
-            <div className="project-tags">
-                {tagsArray.map((tag, index) => (
-                    <span key={index} className="project-tag">
-                        {tag}
-                    </span>
-                ))}
-            </div>
-        );
+      } else {
+        setLoading(false);
+      }
     };
+    
+    fetchCreator();
+  }, [project.createdBy]);
 
-    return (
-        <div className="project-card">
-            <h3>{project.title || project.name}</h3>
-            
-            {/* Descripción con truncamiento si es muy larga */}
-            <p className="project-description">
-                {project.description && project.description.length > 100 
-                    ? `${project.description.substring(0, 100)}...` 
-                    : project.description}
-            </p>
-            
-            {/* Renderizamos las etiquetas */}
-            {renderTags()}
-            
-            <div className="project-card-actions">
-                <Link to={`/project/${project.id}`} className="btn-view">
-                    Ver Proyecto
-                </Link>
-                
-                {showInviteButton && isOwner && (
-                    <button 
-                        onClick={handleInviteClick} 
-                        className="btn-invite"
-                    >
-                        <i className="fas fa-user-plus"></i> Invitar
-                    </button>
-                )}
-            </div>
+  // Manejar solicitud para unirse al proyecto
+  const handleJoinRequest = async () => {
+    if (!currentUser || isCreator || isCollaborator || joining) return;
+    
+    try {
+      setJoining(true);
+      await requestJoinProject(
+        project.id,
+        project.name || 'Proyecto sin nombre',
+        project.createdBy,
+        currentUser.uid,
+        currentUser.displayName || 'Usuario'
+      );
+      setJoinRequestSent(true);
+    } catch (error) {
+      console.error('Error al solicitar unirse al proyecto:', error);
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  // Renderizar el botón apropiado según el rol del usuario
+  const renderActionButton = () => {
+    if (isCreator) {
+      // El usuario es el creador: mostrar botón de Invitar
+      return (
+        <button 
+          onClick={() => onInviteClick && onInviteClick(project.id, project.name)} 
+          className="btn-invite"
+          disabled={!onInviteClick}
+        >
+          Invitar
+        </button>
+      );
+    } else if (isCollaborator) {
+      // El usuario ya es colaborador
+      return (
+        <span className="collaborator-badge">
+          Ya eres colaborador
+        </span>
+      );
+    } else if (joinRequestSent) {
+      // El usuario ha enviado una solicitud
+      return (
+        <span className="request-sent-badge">
+          Solicitud enviada
+        </span>
+      );
+    } else {
+      // El usuario no es ni creador ni colaborador: mostrar botón Unirse
+      return (
+        <button 
+          onClick={handleJoinRequest} 
+          className="btn-join"
+          disabled={joining}
+        >
+          {joining ? 'Enviando...' : 'Unirse'}
+        </button>
+      );
+    }
+  };
+
+  return (
+    <div className="project-card">
+      <h3>{project.title || project.name}</h3>
+      <p className="project-description">
+        {project.description && project.description.length > 100 
+          ? `${project.description.substring(0, 100)}...` 
+          : project.description}
+      </p>
+      
+      {/* Renderizar etiquetas */}
+      {project.tags && project.tags.length > 0 && (
+        <div className="project-tags">
+          {project.tags.map((tag, index) => (
+            <span key={index} className="project-tag">
+              {tag}
+            </span>
+          ))}
         </div>
-    );
+      )}
+      
+      {/* Sección de creador del proyecto */}
+      <div className="project-creator">
+        {loading ? (
+          <span>Cargando creador...</span>
+        ) : creator ? (
+          <div className="creator-info">
+            {/* Se elimina la imagen pero se mantiene el nombre */}
+            <span className="creator-name">
+              Creado por: {creator.displayName || creator.githubUsername || 'Usuario'}
+            </span>
+          </div>
+        ) : (
+          <span>Creador desconocido</span>
+        )}
+      </div>
+      
+      {/* Botones de acción */}
+      <div className="project-card-actions">
+        <Link to={`/project/${project.id}`} className="btn-view">
+          Ver proyecto
+        </Link>
+        {renderActionButton()}
+      </div>
+    </div>
+  );
 };
 
 export default ProjectCard;

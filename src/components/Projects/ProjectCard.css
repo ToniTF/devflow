@@ -79,3 +79,44 @@
 .btn-invite:hover {
     background-color: #f5f9ff;
 }
+
+/* Nuevos estilos añadidos */
+.btn-join {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-join:hover {
+  background-color: #43a047;
+}
+
+.btn-join:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
+}
+
+.collaborator-badge, .request-sent-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+}
+
+.collaborator-badge {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.request-sent-badge {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}

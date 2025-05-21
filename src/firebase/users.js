@@ -163,3 +163,26 @@ export const searchUsersByName = async (searchTerm) => {
     return [];
   }
 };
+
+// Obtiene los datos completos de un usuario, incluyendo información de GitHub
+export const getUserWithGitHubData = async (userId) => {
+  if (!userId) return null;
+  
+  try {
+    const userRef = doc(db, 'users', userId);
+    const userSnapshot = await getDoc(userRef);
+    
+    if (userSnapshot.exists()) {
+      // Devolver datos del usuario con su ID incluido
+      return {
+        id: userSnapshot.id,
+        ...userSnapshot.data()
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error al obtener datos del usuario:', error);
+    return null;
+  }
+};
