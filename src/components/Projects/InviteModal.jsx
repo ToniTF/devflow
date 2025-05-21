@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { updateDoc, doc, arrayUnion } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { searchUsersByName } from '../../firebase/users';
+import { createProjectInvitationNotification } from '../../firebase/notifications';
+import { AuthContext } from '../../context/AuthContext';
 import './InviteModal.css';
 
 const InviteModal = ({ isOpen, onClose, projectId, projectName }) => {
+  const { currentUser } = useContext(AuthContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [selectedUsers, setSelectedUsers] = useState([]);
@@ -65,6 +68,15 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => {
         await updateDoc(projectRef, {
           pendingInvitations: arrayUnion(invitationData)
         });
+        
+        // Crear notificación para el usuario invitado
+        await createProjectInvitationNotification(
+          user.id,
+          projectId,
+          projectName,
+          currentUser.uid,
+          currentUser.displayName || 'Un usuario'
+        );
       }
       
       setMessage('¡Invitaciones enviadas correctamente!');

@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import './Navbar.css';
+import NotificationBell from '../Notifications/NotificationBell';
 
 const Navbar = () => {
     const { currentUser } = useContext(AuthContext);
@@ -27,6 +28,7 @@ const Navbar = () => {
                         <Link to="/profile" className="nav-link">
                             Perfil
                         </Link>
+                        <NotificationBell />
                         <div className="user-menu">
                             <img 
                                 src={currentUser.photoURL || 'https://via.placeholder.com/35'} 

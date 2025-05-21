@@ -12,6 +12,7 @@ import Login from './pages/Login';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
+import NotificationsPage from './pages/NotificationsPage'; // Añadir esta importación
 import './styles.css';
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
                                 <Route path="/project/:id" component={ProjectPage} />
                                 <Route path="/profile" component={Profile} />
                                 <Route path="/login" component={Login} />
+                                <Route path="/notifications" component={NotificationsPage} /> {/* Añadir esta ruta */}
                             </Switch>
                         </main>
                     </div>
