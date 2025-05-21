@@ -4,6 +4,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { AuthContext } from '../context/AuthContext';
 import ProjectCard from '../components/Projects/ProjectCard';
+import InviteModal from '../components/Projects/InviteModal';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -11,6 +12,9 @@ const Dashboard = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [selectedProjectName, setSelectedProjectName] = useState('');
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -61,6 +65,13 @@ const Dashboard = () => {
     fetchProjects();
   }, [currentUser]);
 
+  const handleInviteCollaborator = (projectId) => {
+    const project = projects.find(p => p.id === projectId);
+    setSelectedProjectId(projectId);
+    setSelectedProjectName(project?.name || 'Proyecto');
+    setInviteModalOpen(true);
+  };
+
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
@@ -96,7 +107,8 @@ const Dashboard = () => {
                 key={project.id} 
                 project={project} 
                 isOwner={currentUser && project.createdBy === currentUser.uid}
-                showInviteButton={!!currentUser} // Solo mostrar el botón de invitar si hay usuario
+                showInviteButton={!!currentUser}
+                onInviteCollaborator={handleInviteCollaborator}
               />
             ))
           ) : (
@@ -110,6 +122,15 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+      )}
+
+      {inviteModalOpen && (
+        <InviteModal 
+          isOpen={inviteModalOpen}
+          onClose={() => setInviteModalOpen(false)}
+          projectId={selectedProjectId}
+          projectName={selectedProjectName}
+        />
       )}
     </div>
   );
