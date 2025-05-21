@@ -5,15 +5,16 @@ import { ProjectProvider } from './context/ProjectContext';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import ProjectPage from './pages/ProjectPage';
-import NewProject from './pages/NewProject'; // Añadir esta importación
+import NewProject from './pages/NewProject';
 import EditProject from './pages/EditProject';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
-import NotificationsPage from './pages/NotificationsPage'; // Añadir esta importación
-import MyProjectsPage from './pages/MyProjectsPage'; // Importar el nuevo componente
+import NotificationsPage from './pages/NotificationsPage';
+import MyProjectsPage from './pages/MyProjectsPage';
+import ContactsPage from './pages/ContactsPage'; // Nueva importación
 import './styles.css';
 
 const App = () => {
@@ -28,13 +29,14 @@ const App = () => {
                             <Switch>
                                 <Route path="/" exact component={Home} />
                                 <Route path="/dashboard" component={Dashboard} />
-                                <Route path="/my-projects" component={MyProjectsPage} /> {/* Añadir esta ruta */}
+                                <Route path="/my-projects" component={MyProjectsPage} />
+                                <Route path="/contacts" component={ContactsPage} /> {/* Nueva ruta */}
                                 <Route path="/project/new" component={NewProject} />
-                                <Route path="/project/edit/:id" component={EditProject} /> {/* Añadir esta ruta */}
+                                <Route path="/project/edit/:id" component={EditProject} />
                                 <Route path="/project/:id" component={ProjectPage} />
                                 <Route path="/profile" component={Profile} />
                                 <Route path="/login" component={Login} />
-                                <Route path="/notifications" component={NotificationsPage} /> {/* Añadir esta ruta */}
+                                <Route path="/notifications" component={NotificationsPage} />
                             </Switch>
                         </main>
                     </div>

@@ -16,26 +16,25 @@ const Navbar = () => {
             </div>
             
             <div className="navbar-links">
-                <Link to="/dashboard" className="nav-link">
-                    Proyectos
-                </Link>
-                
+                                
                 {currentUser ? (
                     <>
                         <Link to="/dashboard" className="nav-link">
-                            Dashboard
+                            Proyectos
                         </Link>
-                        <Link to="/profile" className="nav-link">
-                            Perfil
+                        <Link to="/contacts" className="nav-link">
+                            Contactos
                         </Link>
                         <NotificationBell />
-                        <div className="user-menu">
-                            <img 
-                                src={currentUser.photoURL || 'https://via.placeholder.com/35'} 
-                                alt="Avatar" 
-                                className="user-avatar" 
-                            />
-                        </div>
+                        <Link to="/profile" className="user-menu-link">
+                            <div className="user-menu">
+                                <img 
+                                    src={currentUser.photoURL || 'https://via.placeholder.com/35'} 
+                                    alt="Avatar" 
+                                    className="user-avatar" 
+                                />
+                            </div>
+                        </Link>
                     </>
                 ) : (
                     <Link to="/login" className="nav-link auth-button">

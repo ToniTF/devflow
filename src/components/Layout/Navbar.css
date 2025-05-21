@@ -103,3 +103,13 @@
 .auth-button:hover {
   background-color: #1a1f23;
 }
+
+.user-menu-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.user-menu-link:hover {
+  text-decoration: none;
+}
