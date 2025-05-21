@@ -21,9 +21,9 @@ const Sidebar = () => {
                     </Link>
                 </li>
                 <li>
-                    <Link to="/dashboard" className={isActive('/dashboard') ? 'active' : ''}>
+                    <Link to="/my-projects" className={isActive('/my-projects') ? 'active' : ''}>
                         <span className="sidebar-icon">📁</span>
-                        Proyectos
+                        Mis proyectos
                     </Link>
                 </li>
                 {currentUser && (

@@ -13,6 +13,7 @@ import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
 import NotificationsPage from './pages/NotificationsPage'; // Añadir esta importación
+import MyProjectsPage from './pages/MyProjectsPage'; // Importar el nuevo componente
 import './styles.css';
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
                             <Switch>
                                 <Route path="/" exact component={Home} />
                                 <Route path="/dashboard" component={Dashboard} />
+                                <Route path="/my-projects" component={MyProjectsPage} /> {/* Añadir esta ruta */}
                                 <Route path="/project/new" component={NewProject} />
                                 <Route path="/project/edit/:id" component={EditProject} /> {/* Añadir esta ruta */}
                                 <Route path="/project/:id" component={ProjectPage} />
