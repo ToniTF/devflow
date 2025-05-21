@@ -1,57 +1,48 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '../context/AuthContext';
-import { ProjectContext } from '../context/ProjectContext';
-import ProjectCard from '../components/Projects/ProjectCard';
+import { Link } from 'react-router-dom';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
-import '../styles/MyProjects.css';
+import { AuthContext } from '../context/AuthContext';
+import ProjectCard from '../components/Projects/ProjectCard';
+import InviteModal from '../components/Projects/InviteModal';
+import './Dashboard.css';
 
 const MyProjectsPage = () => {
   const { currentUser } = useContext(AuthContext);
-  const { openInviteModal } = useContext(ProjectContext);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [selectedProjectName, setSelectedProjectName] = useState('');
 
   useEffect(() => {
-    if (!currentUser) return;
+    // Si no hay usuario autenticado, no hacemos la consulta
+    if (!currentUser) {
+      setLoading(false);
+      return;
+    }
 
     const fetchProjects = async () => {
-      setLoading(true);
       try {
-        // 1. Obtener proyectos creados por el usuario
-        const createdProjectsQuery = query(
-          collection(db, 'projects'),
-          where('createdBy', '==', currentUser.uid)
+        setLoading(true);
+        // Consultamos solo los proyectos donde el usuario es creador o colaborador
+        const projectsRef = collection(db, 'projects');
+        const userProjectsQuery = query(
+          projectsRef, 
+          where("collaborators", "array-contains", currentUser.uid)
         );
-
-        // 2. Obtener proyectos donde el usuario es colaborador
-        const collabProjectsQuery = query(
-          collection(db, 'projects'),
-          where('collaborators', 'array-contains', currentUser.uid)
-        );
-
-        // Ejecutar ambas consultas
-        const [createdSnapshot, collabSnapshot] = await Promise.all([
-          getDocs(createdProjectsQuery),
-          getDocs(collabProjectsQuery)
-        ]);
-
-        // Combinar los resultados evitando duplicados
-        const projectsMap = new Map();
         
-        createdSnapshot.forEach(doc => {
-          projectsMap.set(doc.id, { id: doc.id, ...doc.data(), isOwner: true });
-        });
-
-        collabSnapshot.forEach(doc => {
-          if (!projectsMap.has(doc.id)) {
-            projectsMap.set(doc.id, { id: doc.id, ...doc.data(), isOwner: false });
-          }
-        });
-
-        setProjects(Array.from(projectsMap.values()));
-      } catch (error) {
-        console.error('Error al cargar proyectos:', error);
+        const userProjectsSnapshot = await getDocs(userProjectsQuery);
+        const userProjects = userProjectsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        setProjects(userProjects);
+      } catch (err) {
+        console.error('Error al cargar proyectos:', err);
+        setError('Error al cargar los proyectos');
       } finally {
         setLoading(false);
       }
@@ -60,29 +51,67 @@ const MyProjectsPage = () => {
     fetchProjects();
   }, [currentUser]);
 
+  const handleInviteCollaborator = (projectId) => {
+    const project = projects.find(p => p.id === projectId);
+    setSelectedProjectId(projectId);
+    setSelectedProjectName(project?.name || 'Proyecto');
+    setInviteModalOpen(true);
+  };
+
+  // Si el usuario no está autenticado, mostrar mensaje de error apropiado
+  if (!currentUser) {
+    return (
+      <div className="error-container" style={{ color: '#c62828', textAlign: 'center', padding: '3rem' }}>
+        Debes iniciar sesión para ver tus proyectos
+      </div>
+    );
+  }
+
   return (
-    <div className="my-projects-container">
-      <h1>Mis proyectos</h1>
+    <div className="dashboard-container">
+      <div className="dashboard-header">
+        <h1>Mis Proyectos</h1>
+        <div className="dashboard-actions">
+          <Link to="/project/new" className="btn btn-primary">
+            <i className="fas fa-plus"></i> Nuevo Proyecto
+          </Link>
+        </div>
+      </div>
+
+      {error && <div className="error-message">{error}</div>}
 
       {loading ? (
-        <div className="loading-container">
-          <p>Cargando proyectos...</p>
-        </div>
-      ) : projects.length > 0 ? (
-        <div className="projects-grid">
-          {projects.map(project => (
-            <ProjectCard 
-              key={project.id} 
-              project={project} 
-              onInviteClick={project.isOwner ? (projectId, projectName) => openInviteModal(projectId, projectName) : null}
-            />
-          ))}
-        </div>
+        <div className="loading">Cargando proyectos...</div>
       ) : (
-        <div className="no-projects-message">
-          <p>No tienes proyectos actualmente.</p>
-          <p>Puedes <a href="/project/new">crear un nuevo proyecto</a> o esperar a ser invitado a colaborar.</p>
+        <div className="projects-grid">
+          {projects.length > 0 ? (
+            projects.map(project => (
+              <ProjectCard 
+                key={project.id} 
+                project={project} 
+                isOwner={project.createdBy === currentUser.uid}
+                showInviteButton={project.createdBy === currentUser.uid}
+                onInviteCollaborator={handleInviteCollaborator}
+              />
+            ))
+          ) : (
+            <div className="no-projects">
+              <p>No tienes proyectos todavía.</p>
+              <Link to="/project/new" className="btn btn-primary">
+                Crear mi primer proyecto
+              </Link>
+            </div>
+          )}
         </div>
+      )}
+
+      {inviteModalOpen && (
+        <InviteModal 
+          isOpen={inviteModalOpen}
+          onClose={() => setInviteModalOpen(false)}
+          projectId={selectedProjectId}
+          projectName={selectedProjectName}
+        />
       )}
     </div>
   );

@@ -1,23 +1,25 @@
 .sidebar {
-  width: 200px; /* Reducir de 250px a 200px */
+  width: 200px;
   height: 100vh;
   background-color: #1a1a2e;
   position: fixed;
   left: 0;
   top: 0;
-  padding-top: 80px; /* Espacio para la navbar */
+  padding-top: 60px; /* Alineado con altura de navbar */
   color: white;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
   z-index: 90;
   transition: all 0.3s ease;
+  overflow-y: auto; /* Permitir scroll vertical si es necesario */
+  overflow-x: hidden; /* Prevenir scroll horizontal */
 }
 
 .sidebar h2 {
   text-align: center;
-  margin-bottom: 30px;
-  font-size: 1.8rem;
+  margin-bottom: 20px; /* Reducido de 30px */
+  font-size: 1.5rem; /* Reducido de 1.8rem */
   color: #4db5ff;
-  padding: 0 20px;
+  padding: 0 15px; /* Reducido de 20px */
 }
 
 .sidebar ul {
@@ -52,10 +54,12 @@
   font-size: 1.2rem;
 }
 
-/* Responsive */
+/* Responsive mejorado */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    width: 80%; /* Ajustar ancho para móviles */
+    max-width: 250px;
   }
   
   .sidebar.active {
