@@ -112,40 +112,33 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => {
             <p className="search-hint">Escribe al menos 3 caracteres para buscar</p>
           )}
           
-          <div className="search-results">
-            {loading ? (
-              <p className="loading-text">Buscando usuarios...</p>
-            ) : searchResults.length > 0 ? (
-              <ul className="users-list">
-                {searchResults.map(user => (
-                  <li 
-                    key={user.id}
-                    className={`user-item ${selectedUsers.some(u => u.id === user.id) ? 'selected' : ''}`}
-                    onClick={() => toggleUserSelection(user)}
-                  >
-                    <div className="user-avatar">
-                      {user.photoURL ? (
-                        <img src={user.photoURL} alt={user.displayName} />
-                      ) : (
-                        <div className="user-initials">
-                          {user.displayName?.charAt(0) || user.email?.charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                    <div className="user-info">
-                      <span className="user-name">{user.displayName}</span>
-                      <span className="user-email">{user.email}</span>
-                    </div>
-                    <div className="selection-indicator">
-                      {selectedUsers.some(u => u.id === user.id) && <span>✓</span>}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : searchTerm.length >= 3 ? (
-              <p className="no-results">No se encontraron usuarios que coincidan con "{searchTerm}"</p>
-            ) : null}
-          </div>
+          {searchResults.length > 0 && (
+            <div className="search-results">
+              {searchResults.map(user => (
+                <div 
+                  key={user.id} 
+                  className={`search-result-item ${selectedUsers.some(u => u.id === user.id) ? 'selected' : ''}`}
+                  onClick={() => toggleUserSelection(user)}
+                >
+                  <img 
+                    src={user.photoURL || 'https://via.placeholder.com/40'} 
+                    alt={user.displayName || user.githubUsername || 'Usuario'}
+                    className="user-avatar" 
+                  />
+                  <div className="user-info">
+                    <span className="user-name">{user.displayName || 'Sin nombre'}</span>
+                    {user.githubUsername && (
+                      <span className="user-github">@{user.githubUsername}</span>
+                    )}
+                    <span className="user-email">{user.email}</span>
+                  </div>
+                  {selectedUsers.some(u => u.id === user.id) && (
+                    <span className="selected-icon">✓</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
           
           {selectedUsers.length > 0 && (
             <div className="selected-users">

@@ -133,6 +133,12 @@
   font-weight: 500;
 }
 
+.user-github {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 2px;
+}
+
 .user-email {
   display: block;
   font-size: 0.85rem;
@@ -242,4 +248,77 @@
 .cancel-button:disabled, .invite-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Estilos para los resultados de búsqueda */
+
+.search-results {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item:hover {
+  background-color: #f5f5f5;
+}
+
+.search-result-item.selected {
+  background-color: #e3f2fd;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.user-github {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.selected-icon {
+  color: #4caf50;
+  font-size: 1.2rem;
+  margin-left: 8px;
+}
+
+.no-results {
+  padding: 15px;
+  text-align: center;
+  color: #777;
 }

@@ -6,7 +6,9 @@ import {
   query, 
   where, 
   getDocs,
-  limit
+  limit,
+  updateDoc,
+  serverTimestamp
 } from 'firebase/firestore';
 import { db, auth } from './config';
 
@@ -17,22 +19,56 @@ export const createUserDocument = async (user, additionalData = {}) => {
   const userRef = doc(db, 'users', user.uid);
   const snapshot = await getDoc(userRef);
 
-  // Si el usuario no existe en Firestore, lo creamos
-  if (!snapshot.exists()) {
-    const { displayName, email, photoURL } = user;
-    const createdAt = new Date();
-
-    try {
+  // Información básica del usuario
+  const userData = {
+    uid: user.uid,
+    displayName: user.displayName,
+    email: user.email,
+    photoURL: user.photoURL,
+    lastUpdated: serverTimestamp()
+  };
+  
+  if (additionalData.github) {
+    // Datos específicos de GitHub
+    const githubData = additionalData.github;
+    
+    // Extraer campos específicos para facilitar consultas
+    userData.githubUsername = githubData.username;
+    userData.githubId = githubData.id;
+    userData.githubUrl = githubData.profileUrl;
+    userData.lastLogin = serverTimestamp();
+    
+    // Guardar todos los datos de GitHub en un subcampo
+    userData.github = {
+      id: githubData.id,
+      username: githubData.username,
+      accessToken: githubData.accessToken,
+      profileUrl: githubData.profileUrl,
+      additionalData: githubData.additionalUserInfo,
+      lastLogin: serverTimestamp()
+    };
+  }
+  
+  try {
+    if (!snapshot.exists()) {
+      // Crear nuevo usuario
       await setDoc(userRef, {
-        displayName,
-        email,
-        photoURL,
-        createdAt,
-        ...additionalData
+        ...userData,
+        createdAt: serverTimestamp(),
+        role: 'user', // Rol predeterminado
+        settings: {
+          language: 'es',
+          theme: 'light',
+          notifications: true
+        },
+        projects: [] // Array vacío de proyectos
       });
-    } catch (error) {
-      console.error('Error al crear el documento de usuario:', error);
+    } else {
+      // Actualizar usuario existente
+      await updateDoc(userRef, userData);
     }
+  } catch (error) {
+    console.error('Error al guardar datos de usuario:', error);
   }
 
   return userRef;
@@ -57,24 +93,71 @@ export const getUserById = async (userId) => {
   }
 };
 
-// Buscar usuarios por nombre para la funcionalidad de invitación
+// Buscar usuarios por nombre o nombre de usuario de GitHub
 export const searchUsersByName = async (searchTerm) => {
   if (!searchTerm || searchTerm.length < 2) return [];
   
   try {
+    const results = [];
     const usersRef = collection(db, 'users');
-    const q = query(
+    const lowercaseSearch = searchTerm.toLowerCase();
+    
+    // Primera consulta: buscar por displayName
+    const nameQuery = query(
       usersRef,
       where('displayName', '>=', searchTerm),
-      where('displayName', '<=', searchTerm + '\uf8ff'), // Truco para búsqueda de prefijo
-      limit(10)
+      where('displayName', '<=', searchTerm + '\uf8ff'),
+      limit(8)
     );
     
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const nameSnapshot = await getDocs(nameQuery);
+    nameSnapshot.docs.forEach(doc => {
+      results.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    // Segunda consulta: buscar por githubUsername
+    const usernameQuery = query(
+      usersRef,
+      where('githubUsername', '>=', lowercaseSearch),
+      where('githubUsername', '<=', lowercaseSearch + '\uf8ff'),
+      limit(8)
+    );
+    
+    const usernameSnapshot = await getDocs(usernameQuery);
+    usernameSnapshot.docs.forEach(doc => {
+      // Evitar duplicados
+      if (!results.some(user => user.id === doc.id)) {
+        results.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      }
+    });
+    
+    // Tercera consulta: buscar por email (si se quiere incluir)
+    const emailQuery = query(
+      usersRef,
+      where('email', '>=', lowercaseSearch),
+      where('email', '<=', lowercaseSearch + '\uf8ff'),
+      limit(5)
+    );
+    
+    const emailSnapshot = await getDocs(emailQuery);
+    emailSnapshot.docs.forEach(doc => {
+      // Evitar duplicados
+      if (!results.some(user => user.id === doc.id)) {
+        results.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      }
+    });
+    
+    // Limitar los resultados finales
+    return results.slice(0, 10);
   } catch (error) {
     console.error('Error al buscar usuarios:', error);
     return [];
