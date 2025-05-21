@@ -65,24 +65,22 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>Panel de Proyectos</h1>
-        <div className="dashboard-actions">
-          {currentUser ? (
+        {/* Solo mostrar el botón de crear proyecto cuando el usuario está autenticado */}
+        {currentUser && (
+          <div className="dashboard-actions">
             <Link to="/project/new" className="btn btn-primary">
               <i className="fas fa-plus"></i> Nuevo Proyecto
             </Link>
-          ) : (
-            <Link to="/login" className="btn btn-primary">
-              <i className="fas fa-sign-in-alt"></i> Iniciar sesión para crear proyectos
-            </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
+      {/* Banner simplificado para usuarios no autenticados */}
       {!currentUser && (
         <div className="login-banner">
           <p>Estás viendo proyectos públicos. Para crear proyectos o ver los tuyos privados, inicia sesión.</p>
           <Link to="/login" className="btn">Iniciar sesión</Link>
-          <Link to="/register" className="btn btn-outline">Registrarse</Link>
+          {/* Eliminamos el botón de registro */}
         </div>
       )}
 
@@ -97,7 +95,8 @@ const Dashboard = () => {
               <ProjectCard 
                 key={project.id} 
                 project={project} 
-                isOwner={currentUser && project.createdBy === currentUser.uid} 
+                isOwner={currentUser && project.createdBy === currentUser.uid}
+                showInviteButton={!!currentUser} // Solo mostrar el botón de invitar si hay usuario
               />
             ))
           ) : (
