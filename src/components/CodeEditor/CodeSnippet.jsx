@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import CodeEditor from './CodeEditor';
+// Cambiar la importación de CodeEditor a MonacoEditor
+import MonacoEditor from './MonacoEditor'; 
 import './CodeSnippet.css';
 
 const CodeSnippet = ({ 
@@ -11,27 +12,24 @@ const CodeSnippet = ({
   onSave = null,
   onDelete = null
 }) => {
-  // Limpiar el código inicial de espacios/saltos al inicio
-  const cleanCode = typeof initialCode === 'string' 
-    ? initialCode.replace(/^\s+/, '') 
-    : '';
-  
-  // Estado local
-  const [code, setCode] = useState(cleanCode);
-  const [snippetTitle, setSnippetTitle] = useState(title || 'Sin título');
-  const [snippetLanguage, setSnippetLanguage] = useState(language || 'javascript');
+  const [code, setCode] = useState(initialCode); 
+  const [snippetTitle, setSnippetTitle] = useState(title);
+  const [snippetLanguage, setSnippetLanguage] = useState(language);
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Actualizar estado local cuando cambian las props
   useEffect(() => {
     setSnippetTitle(title);
     setSnippetLanguage(language);
-    setCode(cleanCode);
-  }, [title, language, cleanCode]);
+    // MonacoEditor usa 'defaultValue' para el contenido inicial,
+    // por lo que no necesitamos limpiar el 'code' aquí de la misma manera.
+    // El estado 'code' se usa para pasar el valor actual y para la lógica de guardado.
+    if (initialCode !== code) {
+      setCode(initialCode);
+    }
+  }, [title, language, initialCode]);
   
-  // Asegurar que se actualice correctamente el código
   const handleCodeChange = (newCode) => {
     setCode(newCode);
   };
@@ -59,6 +57,7 @@ const CodeSnippet = ({
     
     setIsSaving(true);
     try {
+      // Asegurarse de que 'code' tenga el valor más reciente del editor
       await onSave(code, snippetTitle, snippetLanguage, snippetId);
     } catch (error) {
       console.error('Error al guardar el snippet:', error);
@@ -114,6 +113,7 @@ const CodeSnippet = ({
                 <option value="javascript">JavaScript</option>
                 <option value="html">HTML</option>
                 <option value="css">CSS</option>
+                {/* Añadir más lenguajes si MonacoEditor los soporta y los necesitas */}
               </select>
               
               <button 
@@ -140,12 +140,14 @@ const CodeSnippet = ({
       </div>
       
       <div className="code-editor-container">
-        <CodeEditor 
-          initialValue={code}
+        {/* Usar MonacoEditor en lugar de CodeEditor */}
+        <MonacoEditor 
+          value={code} // MonacoEditor usa 'value' (o defaultValue para no controlado)
           language={snippetLanguage}
           readOnly={!editable}
-          onChange={handleCodeChange}
+          onChange={handleCodeChange} // Conectar el onChange
           height="250px"
+          theme="vs-dark" // Coincide con tu preferencia de tema oscuro
         />
       </div>
     </div>
