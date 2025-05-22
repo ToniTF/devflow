@@ -15,12 +15,50 @@ const TaskForm = ({ task, onSubmit, collaborators, onCancel }) => {
   // Inicializar formulario si estamos editando
   useEffect(() => {
     if (task) {
+      let initialDueDate = '';
+      if (task.dueDate) {
+        // Comprobar si es un objeto Timestamp de Firebase
+        if (typeof task.dueDate.toDate === 'function') {
+          try {
+            // Convertir Timestamp a objeto Date y luego a formato YYYY-MM-DD
+            initialDueDate = task.dueDate.toDate().toISOString().split('T')[0];
+          } catch (e) {
+            console.error("Error al formatear dueDate desde Timestamp:", e, task.dueDate);
+            // initialDueDate permanece como '' si hay error
+          }
+        } else {
+          // Si task.dueDate existe pero no es un Timestamp (ej. ya es una cadena o Date obj)
+          // Esto es un fallback, ya que idealmente siempre debería ser un Timestamp si viene de Firestore.
+          try {
+            const dateObj = new Date(task.dueDate);
+            // Comprobar si la fecha resultante es válida antes de formatear
+            if (!isNaN(dateObj.getTime())) {
+              initialDueDate = dateObj.toISOString().split('T')[0];
+            } else {
+              console.warn("task.dueDate no es un Timestamp y no se pudo convertir a fecha válida:", task.dueDate);
+            }
+          } catch (e) {
+            console.error("Error al formatear dueDate (no Timestamp):", e, task.dueDate);
+            // initialDueDate permanece como '' si hay error
+          }
+        }
+      }
+
       setFormData({
         title: task.title || '',
         description: task.description || '',
-        assignedTo: task.assignedTo || '',
-        dueDate: task.dueDate ? new Date(task.dueDate.seconds * 1000).toISOString().split('T')[0] : '',
+        assignedTo: task.assignedTo || '', // Para un select simple, esto está bien.
+        dueDate: initialDueDate,
         priority: task.priority || 'medium'
+      });
+    } else {
+      // Modo creación: resetear formulario a valores iniciales
+      setFormData({
+        title: '',
+        description: '',
+        assignedTo: '',
+        dueDate: '',
+        priority: 'medium'
       });
     }
   }, [task]);
