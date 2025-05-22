@@ -25,15 +25,24 @@ const App = () => {
         setIsMobileSidebarOpen(!isMobileSidebarOpen);
     };
 
+    // Nueva función para cerrar el sidebar móvil
+    const closeMobileSidebar = () => {
+        if (isMobileSidebarOpen) { // Solo cierra si está abierto
+            setIsMobileSidebarOpen(false);
+        }
+    };
+
     return (
         <AuthProvider>
             <ProjectProvider>
                 <Router>
-                    {/* Pasar la función toggle al Navbar */}
                     <Navbar onToggleSidebar={toggleMobileSidebar} />
                     <div className="app-container">
-                        {/* Pasar el estado de apertura al Sidebar */}
-                        <Sidebar isMobileOpen={isMobileSidebarOpen} />
+                        {/* Pasar la función closeMobileSidebar al Sidebar */}
+                        <Sidebar 
+                            isMobileOpen={isMobileSidebarOpen} 
+                            onLinkClick={closeMobileSidebar} // Nueva prop
+                        />
                         <main className="main-content">
                             <Switch>
                                 <Route path="/" exact component={Home} />
