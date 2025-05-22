@@ -11,7 +11,8 @@ import {
   deleteDoc,
   serverTimestamp,
   onSnapshot,
-  arrayUnion // Añadir esta importación
+  arrayUnion,
+  writeBatch // Asegúrate de que writeBatch esté importado aquí
 } from 'firebase/firestore';
 import { db } from './config';
 
@@ -135,6 +136,33 @@ export const deleteNotification = async (notificationId) => {
     await deleteDoc(doc(db, 'notifications', notificationId));
   } catch (error) {
     console.error('Error al eliminar notificación:', error);
+    throw error;
+  }
+};
+
+// Eliminar todas las notificaciones de un usuario
+export const deleteAllNotifications = async (userId) => {
+  try {
+    const notificationsQuery = query(
+      collection(db, 'notifications'),
+      where('recipientId', '==', userId)
+    );
+    
+    const snapshot = await getDocs(notificationsQuery);
+    
+    if (snapshot.empty) {
+      return { success: true, message: 'No hay notificaciones para eliminar.' };
+    }
+
+    const batch = writeBatch(db); // Ahora writeBatch debería estar definido
+    snapshot.docs.forEach(document => { // Cambiado 'doc' a 'document' para evitar conflicto de nombres con la función 'doc' de Firestore
+      batch.delete(document.ref);
+    });
+    
+    await batch.commit();
+    return { success: true };
+  } catch (error) {
+    console.error('Error al eliminar todas las notificaciones:', error);
     throw error;
   }
 };
