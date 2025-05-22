@@ -1,18 +1,17 @@
-import React, { useContext, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import './Sidebar.css';
 
-const Sidebar = () => {
+// Sidebar ahora recibe isMobileOpen como prop
+const Sidebar = ({ isMobileOpen }) => {
   const location = useLocation();
   const { currentUser } = useContext(AuthContext);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Determina si un enlace está activo
-  const isActive = (path) => location.pathname === path;
 
   return (
-    <div className={`sidebar ${isMobile ? 'active' : ''}`}>
+    // Usar la prop isMobileOpen para la clase 'active'
+    <aside className={`sidebar ${isMobileOpen ? 'active' : ''}`}>
+      <h2>Menú</h2> {/* Considera añadir un título o logo aquí también si es apropiado */}
       <ul>
         <li>
           <NavLink exact to="/" activeClassName="active">
@@ -39,7 +38,6 @@ const Sidebar = () => {
             <li>
               <NavLink to="/notifications" activeClassName="active">
                 <i className="fas fa-bell sidebar-icon"></i> Notificaciones
-                {/* Puedes añadir badge de notificaciones aquí */}
               </NavLink>
             </li>
             <li>
@@ -55,7 +53,7 @@ const Sidebar = () => {
           </>
         )}
       </ul>
-    </div>
+    </aside> // Cambiado de div a aside por semántica
   );
 };
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // Importar useState
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProjectProvider } from './context/ProjectContext';
@@ -14,25 +14,33 @@ import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
 import NotificationsPage from './pages/NotificationsPage';
 import MyProjectsPage from './pages/MyProjectsPage';
-import ContactsPage from './pages/ContactsPage'; // Nueva importación
-import CalendarPage from './pages/CalendarPage'; // Nueva importación
+import ContactsPage from './pages/ContactsPage';
+import CalendarPage from './pages/CalendarPage';
 import './styles.css';
 
 const App = () => {
+    const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+    const toggleMobileSidebar = () => {
+        setIsMobileSidebarOpen(!isMobileSidebarOpen);
+    };
+
     return (
         <AuthProvider>
             <ProjectProvider>
                 <Router>
-                    <Navbar />
+                    {/* Pasar la función toggle al Navbar */}
+                    <Navbar onToggleSidebar={toggleMobileSidebar} />
                     <div className="app-container">
-                        <Sidebar />
+                        {/* Pasar el estado de apertura al Sidebar */}
+                        <Sidebar isMobileOpen={isMobileSidebarOpen} />
                         <main className="main-content">
                             <Switch>
                                 <Route path="/" exact component={Home} />
                                 <Route path="/dashboard" component={Dashboard} />
                                 <Route path="/my-projects" component={MyProjectsPage} />
-                                <Route path="/contacts" component={ContactsPage} /> {/* Nueva ruta */}
-                                <Route path="/calendar" component={CalendarPage} /> {/* Nueva ruta para el calendario */}
+                                <Route path="/contacts" component={ContactsPage} />
+                                <Route path="/calendar" component={CalendarPage} />
                                 <Route path="/project/new" component={NewProject} />
                                 <Route path="/project/edit/:id" component={EditProject} />
                                 <Route path="/project/:id" component={ProjectPage} />

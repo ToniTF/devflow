@@ -72,21 +72,63 @@
   object-fit: cover;
 }
 
+/* Estilos para el botón de hamburguesa (galleta) */
+.mobile-sidebar-toggle {
+  display: none; /* Oculto por defecto en pantallas grandes */
+  background: none;
+  border: none;
+  color: white; /* O el color que desees para el icono */
+  font-size: 1.8rem; /* Ajusta el tamaño del icono */
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-right: 0.5rem; /* Espacio entre la hamburguesa y el logo */
+  line-height: 1; /* Para alinear mejor el icono si es de texto o SVG */
+}
+
+/* Estilo para las líneas del icono de hamburguesa (si usas spans) */
+.mobile-sidebar-toggle span {
+  display: block;
+  width: 22px;
+  height: 3px;
+  background-color: white; /* Color de las líneas */
+  margin: 4px 0;
+  transition: transform 0.3s ease;
+}
+
+
 /* Menú desplegable y responsive */
 @media (max-width: 768px) {
   .navbar {
-    padding: 0 1rem; /* Reducir aún más el padding en móviles */
+    padding: 0 1rem; 
+  }
+
+  .navbar-left-section { /* Contenedor para hamburguesa y logo */
+    display: flex;
+    align-items: center;
+  }
+
+  .mobile-sidebar-toggle {
+    display: block; /* Muestra el botón de hamburguesa en móviles */
+    order: -1; /* Para que aparezca antes que el logo si están en el mismo contenedor flex */
   }
   
-  .navbar-links {
+  .navbar-links .nav-link { /* Oculta solo los enlaces de navegación principales */
     display: none;
+  }
+
+  /* Los demás elementos dentro de .navbar-links (como NotificationBell, user-menu-link, auth-button) 
+     permanecerán visibles porque .navbar-links en sí ya no tiene display: none.
+     Asegúrate que .navbar-links (el contenedor) siga siendo flex para alinear estos ítems.
+  */
+  .navbar-links {
+    /* display: flex; ya está definido globalmente y se hereda */
+    /* gap: 1.5rem; ya está definido globalmente, ajusta si es necesario para móvil */
+    gap: 0.75rem; /* Ejemplo de gap reducido para móvil */
   }
   
   .navbar-logo h1 {
-    font-size: 1.2rem; /* Reducir tamaño del título en móviles */
+    font-size: 1.2rem; 
   }
-  
-  /* Agregar menú hamburguesa aquí si se necesita */
 }
 
 /* Añade este estilo si no existe */

@@ -4,15 +4,32 @@ import { AuthContext } from '../../context/AuthContext';
 import './Navbar.css';
 import NotificationBell from '../Notifications/NotificationBell';
 
-const Navbar = () => {
+// Opcional: si usas iconos de una librería, impórtalos. Ej: import { FaBars } from 'react-icons/fa';
+
+// Navbar ahora recibe onToggleSidebar como prop
+const Navbar = ({ onToggleSidebar }) => {
     const { currentUser } = useContext(AuthContext);
 
     return (
         <nav className="navbar">
-            <div className="navbar-logo">
-                <Link to="/">
-                    <h1 id="app_name">DevFlow</h1>
-                </Link>
+            <div className="navbar-left-section"> {/* Contenedor para hamburguesa y logo */}
+                <button
+                    className="mobile-sidebar-toggle"
+                    onClick={onToggleSidebar} // Llama a la función pasada desde App.jsx
+                    aria-label="Abrir menú lateral"
+                    aria-expanded={false} // Podrías pasar el estado isMobileSidebarOpen aquí también si quieres ser más preciso
+                >
+                    {/* Icono de hamburguesa con spans (CSS se encarga de esto) */}
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    {/* Alternativa con react-icons: <FaBars /> */}
+                </button>
+                <div className="navbar-logo">
+                    <Link to="/">
+                        <h1 id="app_name">DevFlow</h1>
+                    </Link>
+                </div>
             </div>
             
             <div className="navbar-links">
