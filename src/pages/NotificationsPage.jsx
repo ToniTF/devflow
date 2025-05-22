@@ -8,8 +8,8 @@ import {
   rejectProjectInvitation, 
   acceptJoinRequest, 
   rejectJoinRequest,
-  deleteNotification, // Importar deleteNotification
-  deleteAllNotifications // Importar deleteAllNotifications
+  deleteNotification,
+  deleteAllNotifications
 } from '../firebase/notifications';
 import './NotificationsPage.css';
 
@@ -18,12 +18,11 @@ const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState({});
-  const [isDeletingAll, setIsDeletingAll] = useState(false); // Estado para eliminar todas
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   useEffect(() => {
     if (!currentUser) return;
 
-    // Suscribirse a las notificaciones del usuario
     const unsubscribe = getNotifications(currentUser.uid, (notificationsList) => {
       setNotifications(notificationsList);
       setLoading(false);
@@ -33,16 +32,15 @@ const NotificationsPage = () => {
   }, [currentUser]);
 
   const handleMarkAsRead = async (notificationId) => {
-    if (processing[notificationId]) return;
-    
+    // No es necesario verificar 'processing' aquí si la UI ya lo hace antes de llamar
     try {
-      setProcessing(prev => ({ ...prev, [notificationId]: true }));
+      // Optimistamente actualiza la UI si es necesario, aunque el listener debería encargarse
+      // setNotifications(prev => prev.map(n => n.id === notificationId ? {...n, read: true} : n));
       await markAsRead(notificationId);
     } catch (error) {
       console.error('Error al marcar como leída:', error);
-    } finally {
-      setProcessing(prev => ({ ...prev, [notificationId]: false }));
     }
+    // No es necesario 'finally' para setProcessing si no se usa aquí
   };
 
   const handleAcceptInvitation = async (notification) => {
@@ -98,17 +96,16 @@ const NotificationsPage = () => {
   };
 
   const handleDeleteNotification = async (notificationId) => {
-    if (processing[notificationId] || window.confirm('¿Estás seguro de eliminar esta notificación?')) {
-      try {
-        setProcessing(prev => ({ ...prev, [notificationId]: true }));
-        await deleteNotification(notificationId);
-        // La lista se actualizará automáticamente por el listener de getNotifications
-      } catch (error) {
-        console.error('Error al eliminar notificación:', error);
-        // Aquí podrías mostrar un mensaje de error al usuario
-      } finally {
-        setProcessing(prev => ({ ...prev, [notificationId]: false }));
-      }
+    // La confirmación ya está en el JSX si es necesaria, o se puede añadir aquí.
+    // if (window.confirm('¿Estás seguro de eliminar esta notificación?')) { ... }
+    if (processing[notificationId]) return;
+    try {
+      setProcessing(prev => ({ ...prev, [notificationId]: true }));
+      await deleteNotification(notificationId);
+    } catch (error) {
+      console.error('Error al eliminar notificación:', error);
+    } finally {
+      setProcessing(prev => ({ ...prev, [notificationId]: false }));
     }
   };
 
@@ -117,39 +114,40 @@ const NotificationsPage = () => {
       try {
         setIsDeletingAll(true);
         await deleteAllNotifications(currentUser.uid);
-        // La lista se actualizará automáticamente
       } catch (error) {
         console.error('Error al eliminar todas las notificaciones:', error);
-        // Aquí podrías mostrar un mensaje de error al usuario
       } finally {
         setIsDeletingAll(false);
       }
     }
   };
 
-  // Renderizar cada notificación según su tipo
   const renderNotification = (notification) => {
+    // console.log('Renderizando notificación:', notification); // Log para ver datos de la notificación
     const isUnread = !notification.read;
     const isProcessed = notification.processed;
-    const isProcessing = processing[notification.id];
+    const isCurrentlyProcessing = processing[notification.id]; 
     
-    // Formatear fecha
     const formattedDate = notification.createdAt ? 
       new Date(notification.createdAt.seconds * 1000).toLocaleString() : 
       'Fecha desconocida';
+
+    const canBeMarkedAsReadOnClick = isUnread && !isProcessed && !isCurrentlyProcessing;
+
+    const mainNotificationClickHandler = () => {
+      if (canBeMarkedAsReadOnClick) {
+        handleMarkAsRead(notification.id);
+      }
+    };
     
     return (
       <div 
         key={notification.id} 
         className={`notification-item ${isUnread ? 'unread' : ''} ${isProcessed ? 'processed' : ''}`}
+        onClick={mainNotificationClickHandler}
       >
         <div className="notification-content">
-          <h4 
-            onClick={() => isUnread && !isProcessed && !isProcessing && handleMarkAsRead(notification.id)} 
-            style={{cursor: (isUnread && !isProcessed && !isProcessing) ? 'pointer' : 'default'}}
-          >
-            {notification.title}
-          </h4>
+          <h4>{notification.title}</h4>
           <p>{notification.message}</p>
           <div className="notification-time">{formattedDate}</div>
           
@@ -166,75 +164,84 @@ const NotificationsPage = () => {
           )}
         </div>
         
+        {/* Contenedor principal para todos los grupos de acciones */}
         <div className="notification-actions-group">
-          {/* Botones de acción para invitaciones a proyectos que no han sido procesadas */}
+        
+          {/* Grupo de acciones para invitaciones a proyectos */}
           {notification.type === 'project_invitation' && !notification.processed && (
             <div className="notification-actions">
               <button 
                 className="btn-accept"
                 onClick={(e) => { e.stopPropagation(); handleAcceptInvitation(notification);}}
-                disabled={isProcessing}
+                disabled={isCurrentlyProcessing}
               >
-                {isProcessing ? 'Procesando...' : 'Aceptar'}
+                {isCurrentlyProcessing ? 'Procesando...' : 'Aceptar'}
               </button>
               <button 
                 className="btn-reject"
                 onClick={(e) => { e.stopPropagation(); handleRejectInvitation(notification);}}
-                disabled={isProcessing}
+                disabled={isCurrentlyProcessing}
               >
-                {isProcessing ? 'Procesando...' : 'Rechazar'}
+                {isCurrentlyProcessing ? 'Procesando...' : 'Rechazar'}
               </button>
             </div>
           )}
 
-          {/* Botones para solicitudes de unión al proyecto */}
+          {/* Grupo de acciones para solicitudes de unión al proyecto */}
           {notification.type === 'join_request' && !notification.processed && (
             <div className="notification-actions">
               <button 
                 className="btn-accept"
                 onClick={(e) => { e.stopPropagation(); handleAcceptJoinRequest(notification);}}
-                disabled={isProcessing}
+                disabled={isCurrentlyProcessing}
               >
-                {isProcessing ? 'Procesando...' : 'Aceptar'}
+                {isCurrentlyProcessing ? 'Procesando...' : 'Aceptar'}
               </button>
               <button 
                 className="btn-reject"
                 onClick={(e) => { e.stopPropagation(); handleRejectJoinRequest(notification);}}
-                disabled={isProcessing}
+                disabled={isCurrentlyProcessing}
               >
-                {isProcessing ? 'Procesando...' : 'Rechazar'}
+                {isCurrentlyProcessing ? 'Procesando...' : 'Rechazar'}
               </button>
             </div>
           )}
           
-          {/* Para notificaciones de invitación aceptada o solicitud de unión aceptada */}
+          {/* Grupo de acciones para enlace "Ver proyecto" */}
           {(notification.type === 'invitation_accepted' || notification.type === 'join_request_accepted') && notification.data?.projectId && (
             <div className="notification-actions">
               <Link 
                 to={`/project/${notification.data.projectId}`}
                 className="btn-view-project"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  // El clic en el padre marcará como leído.
+                }}
               >
                 Ver proyecto
               </Link>
             </div>
           )}
           
-          {/* Botón para eliminar notificación individual (siempre visible a menos que esté procesando) */}
-          <div className="notification-actions">
+          {/* Grupo de acciones para el botón de eliminar individual */}
+          {/* Este div siempre debería renderizarse, el botón interior se deshabilita si isCurrentlyProcessing es true */}
+          <div className="notification-actions"> 
+            {/* console.log('Renderizando botón eliminar para notif:', notification.id, 'isCurrentlyProcessing:', isCurrentlyProcessing) */}
             <button
               className="btn-delete-notification"
               onClick={(e) => {
-                e.stopPropagation(); // Evitar que se marque como leída al hacer clic en eliminar
-                handleDeleteNotification(notification.id);
+                e.stopPropagation(); 
+                if (window.confirm('¿Estás seguro de eliminar esta notificación?')) {
+                  handleDeleteNotification(notification.id);
+                }
               }}
-              disabled={isProcessing}
+              disabled={isCurrentlyProcessing}
               title="Eliminar notificación"
             >
-              <i className="fas fa-trash"></i> Eliminar
+              Eliminar
             </button>
           </div>
-        </div>
+
+        </div> {/* Fin de notification-actions-group */}
       </div>
     );
   };
@@ -251,7 +258,7 @@ const NotificationsPage = () => {
             <button
               className="btn-delete-all"
               onClick={handleDeleteAllNotifications}
-              disabled={isDeletingAll}
+              disabled={isDeletingAll || loading} // Deshabilitar si está cargando notificaciones también
             >
               {isDeletingAll ? 'Eliminando...' : 'Eliminar todas las notificaciones'}
             </button>

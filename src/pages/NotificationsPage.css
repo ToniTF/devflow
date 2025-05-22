@@ -151,23 +151,27 @@
 
 /* Botón para eliminar notificación individual */
 .btn-delete-notification {
-  background: none;
-  border: none;
-  color: #dc3545; /* Rojo para eliminar */
+  background-color: transparent; /* Fondo transparente */
+  border: 1px solid #dc3545; /* Borde rojo */
+  color: #dc3545; /* Texto rojo */
   cursor: pointer;
-  font-size: 1rem; /* Ajustar tamaño del ícono */
-  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem; /* Ajustar tamaño de fuente según sea necesario */
+  padding: 0.3rem 0.7rem; /* Ajustar padding */
   border-radius: 4px;
-  transition: color 0.2s, background-color 0.2s;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+  line-height: 1.2; 
 }
 
 .btn-delete-notification:hover {
-  color: #c82333;
-  background-color: #f8f9fa; /* Un fondo sutil al pasar el mouse */
+  background-color: rgba(220, 53, 69, 0.1); /* Fondo rojo muy sutil al pasar el mouse */
+  color: #c82333; /* Texto rojo más oscuro */
+  border-color: #c82333; /* Borde rojo más oscuro */
 }
 
 .btn-delete-notification:disabled {
   color: #aaa;
+  border-color: #ccc;
+  background-color: transparent;
   cursor: not-allowed;
 }
 
