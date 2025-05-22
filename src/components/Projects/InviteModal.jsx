@@ -1,197 +1,181 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { updateDoc, doc, arrayUnion } from 'firebase/firestore';
-import { db } from '../../firebase/config';
+import React, { useState, useContext, useEffect } from 'react';
+import { ProjectContext } from '../../context/ProjectContext';
 import { searchUsersByName } from '../../firebase/users';
 import { createProjectInvitationNotification } from '../../firebase/notifications';
 import { AuthContext } from '../../context/AuthContext';
 import './InviteModal.css';
 
-const InviteModal = ({ isOpen, onClose, projectId, projectName }) => {
+const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClose viene de las props
+  // const { closeInviteModal, selectedProjectId, selectedProjectName } = useContext(ProjectContext); // No necesitas closeInviteModal del contexto si usas la prop
+  const { selectedProjectId: contextProjectId, selectedProjectName: contextProjectName } = useContext(ProjectContext); // Renombrar para evitar confusión si es necesario
   const { currentUser } = useContext(AuthContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [message, setMessage] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [invitedUsers, setInvitedUsers] = useState([]);
 
-  // Buscar usuarios al escribir
+  // Asegurarse de que el modal es visible con estilos claros
   useEffect(() => {
-    const delaySearch = setTimeout(async () => {
-      if (!searchTerm || searchTerm.length < 3) {
-        setSearchResults([]);
-        return;
-      }
-      
-      setLoading(true);
-      try {
-        const users = await searchUsersByName(searchTerm);
-        setSearchResults(users);
-      } catch (error) {
-        console.error('Error al buscar usuarios:', error);
-      } finally {
-        setLoading(false);
-      }
-    }, 500); // Delay para evitar muchas peticiones
+    // Usar las props projectId y projectName para la lógica inicial si es necesario,
+    // o el estado del contexto si esa es la intención.
+    // El console.log actual usa selectedProjectId y selectedProjectName del contexto.
+    console.log("Modal montado con proyecto (contexto):", contextProjectId, contextProjectName);
+    console.log("Modal montado con proyecto (props):", projectId, projectName);
+  }, [contextProjectId, contextProjectName, projectId, projectName]);
 
-    return () => clearTimeout(delaySearch);
-  }, [searchTerm]);
+  // Dentro del componente InviteModal, al inicio, agrega esto:
+  useEffect(() => {
+    console.log("InviteModal recibió props:", { isOpen, projectId, projectName });
+  }, [isOpen, projectId, projectName]);
 
-  // Seleccionar/deseleccionar usuario
-  const toggleUserSelection = (user) => {
-    if (selectedUsers.some(u => u.id === user.id)) {
-      setSelectedUsers(selectedUsers.filter(u => u.id !== user.id));
-    } else {
-      setSelectedUsers([...selectedUsers, user]);
+  const handleSearch = async () => {
+    if (searchTerm.trim().length < 2) {
+      setErrorMsg('Introduce al menos 2 caracteres para buscar');
+      return;
     }
-  };
 
-  // Enviar invitaciones
-  const handleSendInvitations = async () => {
-    if (selectedUsers.length === 0) return;
-    
-    setSending(true);
+    setLoading(true);
+    setErrorMsg('');
     try {
-      const projectRef = doc(db, 'projects', projectId);
-      
-      // Para cada usuario seleccionado, crear una invitación
-      for (const user of selectedUsers) {
-        const invitationData = {
-          userId: user.id,
-          email: user.email,
-          displayName: user.displayName,
-          status: 'pending',
-          sentAt: new Date()
-        };
-        
-        // Añadir a la lista de invitaciones pendientes del proyecto
-        await updateDoc(projectRef, {
-          pendingInvitations: arrayUnion(invitationData)
-        });
-        
-        // Crear notificación para el usuario invitado
-        await createProjectInvitationNotification(
-          user.id,
-          projectId,
-          projectName,
-          currentUser.uid,
-          currentUser.displayName || 'Un usuario'
-        );
+      const results = await searchUsersByName(searchTerm);
+      // Filtrar usuarios ya invitados
+      const filteredResults = results.filter(
+        user => !invitedUsers.some(invited => invited.id === user.id)
+      );
+      setSearchResults(filteredResults);
+      if (filteredResults.length === 0) {
+        setErrorMsg('No se encontraron usuarios');
       }
-      
-      setMessage('¡Invitaciones enviadas correctamente!');
-      setSearchTerm('');
-      setSelectedUsers([]);
-      setSearchResults([]);
-      
-      // Cerrar el modal después de un breve tiempo
-      setTimeout(() => {
-        onClose();
-        setMessage('');
-      }, 2000);
-      
     } catch (error) {
-      console.error('Error al enviar invitaciones:', error);
-      setMessage('Error al enviar invitaciones. Inténtalo de nuevo.');
+      console.error("Error al buscar usuarios:", error);
+      setErrorMsg('Error al buscar usuarios');
     } finally {
-      setSending(false);
+      setLoading(false);
     }
   };
 
-  // Si el modal no está abierto, no renderizamos nada
-  if (!isOpen) return null;
+  const handleInvite = async (user) => {
+    try {
+      setLoading(true);
+      setErrorMsg('');
+      
+      // Enviar notificación de invitación
+      await createProjectInvitationNotification(
+        user.id,
+        projectId, // Usar prop
+        projectName, // Usar prop
+        currentUser.uid,
+        currentUser.displayName || 'Usuario'
+      );
+      
+      // Actualizar la UI
+      setInvitedUsers([...invitedUsers, user]);
+      setSearchResults(prev => prev.filter(u => u.id !== user.id));
+      setSuccessMsg(`Invitación enviada a ${user.displayName || user.email}`);
+      
+      // Limpiar mensaje de éxito después de unos segundos
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (error) {
+      console.error("Error al enviar invitación:", error);
+      setErrorMsg('Error al enviar la invitación');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Verificar que las props están llegando
+  console.log("InviteModal renderizado con:", { isOpen, projectId, projectName });
+  
   return (
-    <div className="modal-overlay">
+    <div className="modal-backdrop"> {/* Solo renderizar si isOpen es true */}
       <div className="invite-modal">
         <div className="modal-header">
-          <h2>Invitar colaboradores a "{projectName}"</h2>
+          <h2>Invitar colaboradores</h2>
+          {/* Usar la prop onClose */}
           <button className="close-button" onClick={onClose}>×</button>
         </div>
         
-        <div className="modal-content">
+        <div className="modal-body">
+          {/* Usar la prop projectName para mostrar el nombre del proyecto */}
+          <p>Proyecto: <strong>{projectName}</strong></p>
+          
           <div className="search-container">
-            <input 
+            <input
               type="text"
-              className="search-input"
-              placeholder="Buscar usuarios por nombre (mínimo 3 caracteres)..."
+              placeholder="Buscar por nombre o email"
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
             />
+            <button 
+              onClick={handleSearch} 
+              disabled={loading}
+              className="search-button"
+            >
+              {loading ? 'Buscando...' : 'Buscar'}
+            </button>
           </div>
           
-          {searchTerm.length > 0 && searchTerm.length < 3 && (
-            <p className="search-hint">Escribe al menos 3 caracteres para buscar</p>
-          )}
+          {errorMsg && <div className="error-message">{errorMsg}</div>}
+          {successMsg && <div className="success-message">{successMsg}</div>}
           
-          {searchResults.length > 0 && (
-            <div className="search-results">
-              {searchResults.map(user => (
-                <div 
-                  key={user.id} 
-                  className={`search-result-item ${selectedUsers.some(u => u.id === user.id) ? 'selected' : ''}`}
-                  onClick={() => toggleUserSelection(user)}
-                >
-                  <img 
-                    src={user.photoURL || 'https://via.placeholder.com/40'} 
-                    alt={user.displayName || user.githubUsername || 'Usuario'}
-                    className="user-avatar" 
-                  />
-                  <div className="user-info">
-                    <span className="user-name">{user.displayName || 'Sin nombre'}</span>
-                    {user.githubUsername && (
-                      <span className="user-github">@{user.githubUsername}</span>
-                    )}
-                    <span className="user-email">{user.email}</span>
-                  </div>
-                  {selectedUsers.some(u => u.id === user.id) && (
-                    <span className="selected-icon">✓</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-          
-          {selectedUsers.length > 0 && (
-            <div className="selected-users">
-              <h3>Usuarios seleccionados ({selectedUsers.length})</h3>
-              <ul className="selected-users-list">
-                {selectedUsers.map(user => (
-                  <li key={user.id} className="selected-user-tag">
-                    <span>{user.displayName}</span>
+          <div className="results-container">
+            <h3>Resultados</h3>
+            {searchResults.length > 0 ? (
+              <ul className="user-list">
+                {searchResults.map(user => (
+                  <li key={user.id} className="user-item">
+                    <div className="user-info">
+                      <img 
+                        src={user.photoURL || 'https://via.placeholder.com/40'} 
+                        alt={user.displayName || 'Usuario'} 
+                        className="user-avatar"
+                      />
+                      <span className="user-name">{user.displayName || user.email}</span>
+                    </div>
                     <button 
-                      onClick={() => toggleUserSelection(user)}
-                      className="remove-selected"
+                      onClick={() => handleInvite(user)}
+                      className="invite-button"
+                      disabled={loading}
                     >
-                      ×
+                      Invitar
                     </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="no-results">No hay resultados</p>
+            )}
+          </div>
+          
+          {invitedUsers.length > 0 && (
+            <div className="invited-container">
+              <h3>Usuarios invitados</h3>
+              <ul className="user-list">
+                {invitedUsers.map(user => (
+                  <li key={user.id} className="user-item invited">
+                    <div className="user-info">
+                      <img 
+                        src={user.photoURL || 'https://via.placeholder.com/40'} 
+                        alt={user.displayName || 'Usuario'} 
+                        className="user-avatar"
+                      />
+                      <span className="user-name">{user.displayName || user.email}</span>
+                    </div>
+                    <span className="invited-badge">Invitado</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
-          
-          {message && (
-            <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
-              {message}
-            </div>
-          )}
         </div>
         
         <div className="modal-footer">
-          <button 
-            className="cancel-button"
-            onClick={onClose}
-            disabled={sending}
-          >
-            Cancelar
-          </button>
-          <button 
-            className="invite-button"
-            onClick={handleSendInvitations}
-            disabled={selectedUsers.length === 0 || sending}
-          >
-            {sending ? 'Enviando...' : 'Enviar invitaciones'}
+          {/* Usar la prop onClose */}
+          <button onClick={onClose} className="cancel-button">
+            Cerrar
           </button>
         </div>
       </div>

@@ -1,12 +1,16 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import InviteModal from '../components/Projects/InviteModal';
 
 export const ProjectContext = createContext();
 
 export const ProjectProvider = ({ children }) => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [selectedProjectName, setSelectedProjectName] = useState('');
   
   // Cargar proyectos al iniciar
   useEffect(() => {
@@ -62,6 +66,17 @@ export const ProjectProvider = ({ children }) => {
     setProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
   };
 
+  const openInviteModal = (projectId, projectName) => {
+    console.log('Abriendo modal para:', projectId, projectName);
+    setSelectedProjectId(projectId);
+    setSelectedProjectName(projectName);
+    setInviteModalOpen(true);
+  };
+  
+  const closeInviteModal = () => {
+    setInviteModalOpen(false);
+  };
+  
   // Proporcionar el contexto con todas las funciones
   return (
     <ProjectContext.Provider 
@@ -70,10 +85,15 @@ export const ProjectProvider = ({ children }) => {
         loading,
         addProject,
         updateProject,
-        removeProject // Añadir esta función al contexto
+        removeProject, 
+        openInviteModal,
+        closeInviteModal,
+        selectedProjectId,
+        selectedProjectName
       }}
     >
       {children}
+      {inviteModalOpen && <InviteModal />}
     </ProjectContext.Provider>
   );
 };

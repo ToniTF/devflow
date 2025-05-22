@@ -47,6 +47,15 @@ const Sidebar = () => {
                 <i className="fas fa-user sidebar-icon"></i> Perfil
               </NavLink>
             </li>
+            <li>
+              <NavLink 
+                to="/calendar" 
+                className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}
+              >
+                <i className="fas fa-calendar-alt"></i>
+                <span>Calendario</span>
+              </NavLink>
+            </li>
           </>
         )}
       </ul>

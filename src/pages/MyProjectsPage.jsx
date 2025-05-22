@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { AuthContext } from '../context/AuthContext';
+import { ProjectContext } from '../context/ProjectContext'; // Asegúrate de importar el contexto de proyectos
 import ProjectCard from '../components/Projects/ProjectCard';
 import InviteModal from '../components/Projects/InviteModal';
 import './Dashboard.css';
 
 const MyProjectsPage = () => {
   const { currentUser } = useContext(AuthContext);
+  const { openInviteModal } = useContext(ProjectContext); // Asegúrate de tener acceso a esta función
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -86,12 +88,11 @@ const MyProjectsPage = () => {
         <div className="projects-grid">
           {projects.length > 0 ? (
             projects.map(project => (
-              <ProjectCard 
-                key={project.id} 
-                project={project} 
-                isOwner={project.createdBy === currentUser.uid}
-                showInviteButton={project.createdBy === currentUser.uid}
-                onInviteCollaborator={handleInviteCollaborator}
+              <ProjectCard
+                key={project.id}
+                project={project}
+                // Usar project.createdBy para determinar si el usuario es el propietario
+                onInviteClick={project.createdBy === currentUser?.uid ? (projectId, projectName) => openInviteModal(projectId, projectName) : undefined}
               />
             ))
           ) : (

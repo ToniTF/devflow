@@ -128,3 +128,63 @@ export const changeTaskStatus = async (projectId, taskId, status) => {
     throw error;
   }
 };
+
+/**
+ * Obtiene todas las tareas asignadas al usuario en todos los proyectos
+ * @param {string} userId - ID del usuario
+ * @returns {Promise<Array>} - Array con las tareas
+ */
+export const getUserTasks = async (userId) => {
+  try {
+    // Primero, obtener todos los proyectos donde el usuario es creador o colaborador
+    const projectsQuery1 = query(
+      collection(db, 'projects'),
+      where('createdBy', '==', userId)
+    );
+    
+    const projectsQuery2 = query(
+      collection(db, 'projects'),
+      where('collaborators', 'array-contains', userId)
+    );
+    
+    const [snapshot1, snapshot2] = await Promise.all([
+      getDocs(projectsQuery1),
+      getDocs(projectsQuery2)
+    ]);
+    
+    // Combinar los resultados evitando duplicados
+    const projectIds = new Set();
+    snapshot1.forEach(doc => projectIds.add(doc.id));
+    snapshot2.forEach(doc => projectIds.add(doc.id));
+    
+    // Si no hay proyectos, devolver array vacío
+    if (projectIds.size === 0) return [];
+    
+    // Para cada proyecto, obtener las tareas asignadas al usuario
+    const allTasks = [];
+    for (const projectId of projectIds) {
+      // Consultar tareas donde el usuario es asignado o responsable
+      const tasksQuery = query(
+        collection(db, `projects/${projectId}/tasks`),
+        where('assignedTo', '==', userId)
+      );
+      
+      const tasksSnapshot = await getDocs(tasksQuery);
+      
+      // Añadir el projectId a cada tarea para poder navegar luego
+      tasksSnapshot.forEach(doc => {
+        const taskData = doc.data();
+        allTasks.push({
+          id: doc.id,
+          projectId,
+          ...taskData
+        });
+      });
+    }
+    
+    return allTasks;
+  } catch (error) {
+    console.error('Error al obtener tareas del usuario:', error);
+    return [];
+  }
+};

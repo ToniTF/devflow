@@ -15,6 +15,7 @@ import Footer from './components/Layout/Footer';
 import NotificationsPage from './pages/NotificationsPage';
 import MyProjectsPage from './pages/MyProjectsPage';
 import ContactsPage from './pages/ContactsPage'; // Nueva importación
+import CalendarPage from './pages/CalendarPage'; // Nueva importación
 import './styles.css';
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
                                 <Route path="/dashboard" component={Dashboard} />
                                 <Route path="/my-projects" component={MyProjectsPage} />
                                 <Route path="/contacts" component={ContactsPage} /> {/* Nueva ruta */}
+                                <Route path="/calendar" component={CalendarPage} /> {/* Nueva ruta para el calendario */}
                                 <Route path="/project/new" component={NewProject} />
                                 <Route path="/project/edit/:id" component={EditProject} />
                                 <Route path="/project/:id" component={ProjectPage} />

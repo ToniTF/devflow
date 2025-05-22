@@ -11,10 +11,20 @@ const ProjectCard = ({ project, onInviteClick }) => {
   const [joining, setJoining] = useState(false);
   const [joinRequestSent, setJoinRequestSent] = useState(false);
   const { currentUser } = useContext(AuthContext);
-  
-  // Verificar si el usuario actual es el creador
   const isCreator = currentUser && project.createdBy === currentUser.uid;
-  
+
+  const handleInviteButtonClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("ProjectCard: Botón invitar clickeado. Tipo de onInviteClick:", typeof onInviteClick);
+    if (typeof onInviteClick === 'function') {
+      onInviteClick(project.id, project.name || project.title);
+    } else {
+      console.warn("ProjectCard: onInviteClick no es una función o no fue proporcionada.", onInviteClick);
+      // Podrías mostrar un mensaje al usuario o simplemente no hacer nada.
+    }
+  };
+
   // Verificar si el usuario actual ya es colaborador
   const isCollaborator = currentUser && 
                          project.collaborators && 
@@ -64,12 +74,11 @@ const ProjectCard = ({ project, onInviteClick }) => {
   // Renderizar el botón apropiado según el rol del usuario
   const renderActionButton = () => {
     if (isCreator) {
-      // El usuario es el creador: mostrar botón de Invitar
+      // El usuario es el creador: mostrar botón de Invitar siempre activo
       return (
         <button 
-          onClick={() => onInviteClick && onInviteClick(project.id, project.name)} 
+          onClick={handleInviteButtonClick} 
           className="btn-invite"
-          disabled={!onInviteClick}
         >
           Invitar
         </button>
