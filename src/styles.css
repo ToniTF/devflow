@@ -46,6 +46,31 @@ a:hover {
     background-color: #0056b3;
 }
 
+/* Estilos para el botón de peligro (rojo) */
+.btn.btn-danger, /* Hacerlo un poco más específico para asegurar la anulación */
+.btn-danger {     /* O simplemente .btn-danger si el orden es suficiente */
+  background-color: #dc3545;
+  color: white;
+  /* Puedes decidir si quieres que herede el padding de .btn o use el suyo propio. */
+  /* Si quieres el padding específico de btn-danger: */
+  padding: 0.5rem 1rem; /* Aprox. 8px 16px si 1rem = 16px */
+  border-radius: 4px; /* Ligeramente diferente de .btn */
+  /* Las demás propiedades como border, cursor se heredan o se definen igual */
+}
+
+.btn.btn-danger:hover,
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+.btn.btn-danger:disabled,
+.btn-danger:disabled {
+  background-color: #f5b6bc;
+  cursor: not-allowed;
+  /* Podrías querer que el color del texto cambie también en estado disabled */
+  /* color: #a7a7a7; */
+}
+
 .modal {
     display: none;
     position: fixed;

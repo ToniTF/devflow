@@ -259,7 +259,7 @@
 }
 
 /* Botón de eliminar proyecto */
-.btn-danger {
+/* .btn-danger {
   background-color: #dc3545;
   color: white;
   border: none;
@@ -276,7 +276,7 @@
 .btn-danger:disabled {
   background-color: #f5b6bc;
   cursor: not-allowed;
-}
+} */
 
 .project-actions {
   display: flex;
