@@ -13,6 +13,7 @@ const Sidebar = ({ isMobileOpen }) => {
     <aside className={`sidebar ${isMobileOpen ? 'active' : ''}`}>
       <h2>Menú</h2> {/* Considera añadir un título o logo aquí también si es apropiado */}
       <ul>
+        {/* Enlaces siempre visibles */}
         <li>
           <NavLink exact to="/" activeClassName="active">
             <i className="fas fa-home sidebar-icon"></i> Inicio
@@ -23,7 +24,17 @@ const Sidebar = ({ isMobileOpen }) => {
             <i className="fas fa-th-large sidebar-icon"></i> Proyectos
           </NavLink>
         </li>
-        {currentUser && (
+
+        {/* Enlaces condicionales basados en el estado de autenticación */}
+        {!currentUser ? (
+          // Mostrar Login si no hay usuario logueado
+          <li>
+            <NavLink to="/login" activeClassName="active">
+              <i className="fas fa-sign-in-alt sidebar-icon"></i> Login
+            </NavLink>
+          </li>
+        ) : (
+          // Mostrar enlaces específicos del usuario si está logueado
           <>
             <li>
               <NavLink to="/my-projects" activeClassName="active">
@@ -53,7 +64,7 @@ const Sidebar = ({ isMobileOpen }) => {
           </>
         )}
       </ul>
-    </aside> // Cambiado de div a aside por semántica
+    </aside>
   );
 };
 
