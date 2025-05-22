@@ -1,0 +1,83 @@
+.code-editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.code-editor-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+}
+
+.code-editor-language {
+  font-weight: bold;
+}
+
+.code-editor-indicator {
+  color: #8bc34a;
+  font-size: 0.75rem;
+}
+
+.code-editor-wrapper {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Asegúrate de que CodeMirror ocupe todo el espacio disponible */
+.CodeMirror {
+  height: 100% !important;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Estilo para los números de línea */
+.CodeMirror-linenumber {
+  color: #999;
+  padding: 0 5px;
+}
+
+/* Asegurar que el texto sea visible en tema oscuro */
+.cm-s-material .CodeMirror-line {
+  color: #e0e0e0; /* Texto claro para fondo oscuro */
+}
+
+/* Mejorar la legibilidad del texto escrito */
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+}
+
+/* Volver al tema oscuro para el editor */
+.cm-s-material.CodeMirror {
+  background-color: #2d2d2d; /* Fondo oscuro */
+  color: #e0e0e0;
+}
+
+.cm-s-material .CodeMirror-gutters {
+  background-color: #262626; /* Fondo oscuro para los números de línea */
+  border-right: 1px solid #444;
+}
+
+/* Mejorar visibilidad del cursor en fondo oscuro */
+.CodeMirror-cursor {
+  border-left: 1px solid #fff !important;
+}
+
+/* Número de líneas más visibles en fondo oscuro */
+.cm-s-material .CodeMirror-linenumber {
+  color: #888;
+}

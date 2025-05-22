@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useHistory } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove, arrayUnion } from 'firebase/firestore'; // Añadida importación de arrayUnion
 import { db } from '../firebase/config';
 import { deleteProject } from '../firebase/projects';
 import ChatRoom from '../components/Chat/ChatRoom';
 import TaskManager from '../components/Tasks/TaskManager';
 import CloudinaryUploader from '../components/Files/CloudinaryUploader';
+import CodeSnippet from '../components/CodeEditor/CodeSnippet';
 import './ProjectPage.css';
 
 const ProjectPage = () => {
@@ -96,6 +97,102 @@ const ProjectPage = () => {
       setError('No se pudo eliminar el proyecto. Inténtalo de nuevo.');
       setIsDeleting(false);
       setShowDeleteConfirmation(false);
+    }
+  };
+
+  // Para guardar snippets de código
+  const handleSaveCodeSnippet = async (code, title, language, snippetId) => {
+    try {
+      // Si ya existe un snippet, actualizarlo en lugar de crear uno nuevo
+      if (snippetId && project.codeSnippets) {
+        // Primero eliminamos el snippet existente
+        const updatedSnippets = project.codeSnippets.filter(s => s.id !== snippetId);
+        
+        // Luego creamos el snippet actualizado
+        const updatedSnippet = {
+          id: snippetId,
+          code: code,
+          language: language || 'javascript',
+          title: title || 'Snippet sin título',
+          createdBy: currentUser.uid,
+          updatedAt: new Date()
+        };
+        
+        // Actualizar en Firestore
+        const projectRef = doc(db, "projects", id);
+        await updateDoc(projectRef, {
+          codeSnippets: [...updatedSnippets, updatedSnippet]
+        });
+        
+        // Actualizar estado local
+        setProject(prev => ({
+          ...prev,
+          codeSnippets: [...updatedSnippets, updatedSnippet]
+        }));
+        
+        return true;
+      }
+      
+      // Crear nuevo snippet
+      const snippetData = {
+        id: Date.now().toString(),
+        code: code,
+        language: language || 'javascript',
+        title: title || 'Snippet sin título',
+        createdBy: currentUser.uid,
+        createdAt: new Date()
+      };
+      
+      const projectRef = doc(db, "projects", id);
+      
+      // Si no hay snippets previos, inicializar el array
+      if (!project.codeSnippets) {
+        await updateDoc(projectRef, {
+          codeSnippets: [snippetData]
+        });
+      } else {
+        // Añadir al array existente
+        await updateDoc(projectRef, {
+          codeSnippets: [...project.codeSnippets, snippetData]
+        });
+      }
+      
+      // Actualizar el estado local
+      setProject(prev => ({
+        ...prev,
+        codeSnippets: [...(prev.codeSnippets || []), snippetData]
+      }));
+      
+      return true;
+    } catch (error) {
+      console.error('Error al guardar el snippet:', error);
+      return false;
+    }
+  };
+  
+  // Eliminar snippet de código
+  const handleDeleteSnippet = async (snippetId) => {
+    try {
+      if (!snippetId || !project.codeSnippets) return false;
+      
+      // Actualizar en Firestore
+      const projectRef = doc(db, "projects", id);
+      const updatedSnippets = project.codeSnippets.filter(snippet => snippet.id !== snippetId);
+      
+      await updateDoc(projectRef, {
+        codeSnippets: updatedSnippets
+      });
+      
+      // Actualizar estado local inmediatamente
+      setProject(prev => ({
+        ...prev,
+        codeSnippets: prev.codeSnippets.filter(snippet => snippet.id !== snippetId)
+      }));
+      
+      return true;
+    } catch (error) {
+      console.error('Error al eliminar el snippet:', error);
+      return false;
     }
   };
 
@@ -224,6 +321,37 @@ const ProjectPage = () => {
             />
           </div>
         )}
+
+        {/* Sección de snippets de código */}
+        <div className="project-code-snippets">
+          <h3>Snippets de código</h3>
+          
+          {/* Añadir nuevo snippet */}
+          {(isOwner || isCollaborator) && (
+            <CodeSnippet
+              title="Nuevo Snippet"
+              onSave={handleSaveCodeSnippet}
+            />
+          )}
+          
+          {/* Lista de snippets existentes */}
+          {project.codeSnippets && project.codeSnippets.length > 0 ? (
+            project.codeSnippets.map(snippet => (
+              <CodeSnippet
+                key={snippet.id}
+                snippetId={snippet.id}
+                initialCode={snippet.code}
+                language={snippet.language || 'javascript'}
+                title={snippet.title || 'Sin título'}
+                editable={isOwner || currentUser.uid === snippet.createdBy}
+                onSave={handleSaveCodeSnippet}
+                onDelete={handleDeleteSnippet}
+              />
+            ))
+          ) : (
+            <p>No hay snippets de código en este proyecto</p>
+          )}
+        </div>
       </div>
     </div>
   );

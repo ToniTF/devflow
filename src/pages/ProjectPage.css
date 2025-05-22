@@ -55,8 +55,10 @@
     max-width: calc(50% - 1rem);
   }
   
-  .project-tasks-section {
+  .project-tasks-section,
+  .project-code-snippets {
     width: 100%;
+    max-width: 100%;
   }
 }
 
@@ -196,6 +198,10 @@
   .project-chat {
     max-width: 100%;
   }
+  
+  .project-code-snippets {
+    padding: 1rem;
+  }
 }
 
 /* Estilos para el modal de confirmación de eliminación */
@@ -276,4 +282,42 @@
   display: flex;
   gap: 10px;
   align-items: center;
+}
+
+/* Estilos para la sección de snippets de código */
+.project-code-snippets {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  width: 100%; /* Asegurar que ocupe todo el ancho disponible */
+}
+
+/* Para pantallas más grandes, hacer que ocupe todo el ancho */
+@media (min-width: 992px) {
+  .project-content {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .project-files,
+  .project-chat {
+    flex: 1;
+    min-width: 300px;
+    max-width: calc(50% - 1rem);
+  }
+  
+  .project-tasks-section,
+  .project-code-snippets {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* En dispositivos móviles, mantener el diseño vertical */
+@media (max-width: 991px) {
+  .project-code-snippets {
+    padding: 1rem;
+  }
 }
