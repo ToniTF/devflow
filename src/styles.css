@@ -71,6 +71,20 @@ a:hover {
   /* color: #a7a7a7; */
 }
 
+/* Estilos para el botón de eliminar (variante de btn) */
+.btn.btn-delete { /* Selector más específico */
+  background-color: #ffebee; /* Fondo rojo claro, como en TaskItem.css */
+  color: #c62828;    /* Color de texto rojo oscuro, como en TaskItem.css */
+  /* Hereda padding, font-size, etc., de .btn y .btn-sm */
+  /* Si necesitas un borde específico, añádelo aquí */
+  /* border: 1px solid #c62828; */
+}
+
+.btn.btn-delete:hover {
+  background-color: #ffcdd2; /* Un rojo un poco más oscuro para el hover */
+  color: #b71c1c;
+}
+
 .modal {
     display: none;
     position: fixed;

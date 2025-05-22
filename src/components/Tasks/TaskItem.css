@@ -107,8 +107,9 @@
 }
 
 .btn-delete {
-  background: #ffebee;
-  color: #c62828;
+  /* background: #ffebee; */ /* Ahora manejado en styles.css */
+  /* color: #c62828; */    /* Ahora manejado en styles.css */
+  /* Mantén otras propiedades si son específicas de este contexto y no son colores/fondo */
 }
 
 .dropdown {
