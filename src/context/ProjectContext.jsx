@@ -57,6 +57,12 @@ export const ProjectProvider = ({ children }) => {
     );
   };
   
+  // Función para eliminar un proyecto del estado global
+  const removeProject = (projectId) => {
+    setProjects(prevProjects => prevProjects.filter(project => project.id !== projectId));
+  };
+
+  // Proporcionar el contexto con todas las funciones
   return (
     <ProjectContext.Provider 
       value={{ 
@@ -64,8 +70,7 @@ export const ProjectProvider = ({ children }) => {
         loading,
         addProject,
         updateProject,
-        deleteProject,
-        updateProjectInList
+        removeProject // Añadir esta función al contexto
       }}
     >
       {children}

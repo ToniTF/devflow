@@ -3,8 +3,9 @@ import { useParams, Link, useHistory } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import { deleteProject } from '../firebase/projects';
 import ChatRoom from '../components/Chat/ChatRoom';
-import TaskManager from '../components/Tasks/TaskManager'; // Añadir esta importación
+import TaskManager from '../components/Tasks/TaskManager';
 import CloudinaryUploader from '../components/Files/CloudinaryUploader';
 import './ProjectPage.css';
 
@@ -15,6 +16,8 @@ const ProjectPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filesUpdated, setFilesUpdated] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -70,6 +73,32 @@ const ProjectPage = () => {
     }
   };
 
+  // Función para iniciar el proceso de eliminación (muestra el modal)
+  const handleShowDeleteConfirmation = () => {
+    setShowDeleteConfirmation(true);
+  };
+
+  // Función para cancelar la eliminación
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+  };
+
+  // Función para confirmar y ejecutar la eliminación
+  const handleConfirmDelete = async () => {
+    if (!isOwner) return;
+    
+    try {
+      setIsDeleting(true);
+      await deleteProject(id);
+      history.push('/my-projects');
+    } catch (error) {
+      console.error('Error al eliminar el proyecto:', error);
+      setError('No se pudo eliminar el proyecto. Inténtalo de nuevo.');
+      setIsDeleting(false);
+      setShowDeleteConfirmation(false);
+    }
+  };
+
   if (loading) return <div className="loading-container">Cargando proyecto...</div>;
   if (error) return <div className="error-container">{error}</div>;
   if (!project) return <div className="error-container">Proyecto no encontrado</div>;
@@ -89,6 +118,13 @@ const ProjectPage = () => {
               >
                 Editar
               </button>
+              <button 
+                className="btn btn-danger"
+                onClick={handleShowDeleteConfirmation}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Eliminando...' : 'Eliminar proyecto'}
+              </button>
             </div>
           )}
         </div>
@@ -101,6 +137,35 @@ const ProjectPage = () => {
           </span>
         </div>
       </div>
+
+      {/* Modal de confirmación para eliminar el proyecto */}
+      {showDeleteConfirmation && (
+        <div className="delete-confirmation-overlay">
+          <div className="delete-confirmation-modal">
+            <h2>Eliminar proyecto</h2>
+            <p>¿Estás seguro de que quieres eliminar este proyecto?</p>
+            <p className="delete-warning">
+              Esta acción no se puede deshacer. Se eliminarán todas las tareas, mensajes y archivos asociados.
+            </p>
+            <div className="delete-actions">
+              <button 
+                className="btn btn-secondary"
+                onClick={handleCancelDelete}
+                disabled={isDeleting}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn btn-danger confirm-delete"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Eliminando...' : 'Eliminar definitivamente'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="project-description">
         <h3>Descripción</h3>
