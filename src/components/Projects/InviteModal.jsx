@@ -5,10 +5,11 @@ import { createProjectInvitationNotification } from '../../firebase/notification
 import { AuthContext } from '../../context/AuthContext';
 import './InviteModal.css';
 
-const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClose viene de las props
-  // const { closeInviteModal, selectedProjectId, selectedProjectName } = useContext(ProjectContext); // No necesitas closeInviteModal del contexto si usas la prop
-  const { selectedProjectId: contextProjectId, selectedProjectName: contextProjectName } = useContext(ProjectContext); // Renombrar para evitar confusión si es necesario
+const InviteModal = ({ isOpen, onClose, projectId, projectName }) => {
   const { currentUser } = useContext(AuthContext);
+  // Si necesitas datos del contexto del proyecto, puedes obtenerlos, pero onClose viene de props.
+  // const { selectedProjectId: contextProjectId, selectedProjectName: contextProjectName } = useContext(ProjectContext);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -16,37 +17,34 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClos
   const [successMsg, setSuccessMsg] = useState('');
   const [invitedUsers, setInvitedUsers] = useState([]);
 
-  // Asegurarse de que el modal es visible con estilos claros
-  useEffect(() => {
-    // Usar las props projectId y projectName para la lógica inicial si es necesario,
-    // o el estado del contexto si esa es la intención.
-    // El console.log actual usa selectedProjectId y selectedProjectName del contexto.
-    console.log("Modal montado con proyecto (contexto):", contextProjectId, contextProjectName);
-    console.log("Modal montado con proyecto (props):", projectId, projectName);
-  }, [contextProjectId, contextProjectName, projectId, projectName]);
-
-  // Dentro del componente InviteModal, al inicio, agrega esto:
   useEffect(() => {
     console.log("InviteModal recibió props:", { isOpen, projectId, projectName });
+    if (isOpen) {
+      // Resetear estados internos cuando el modal se abre
+      setSearchTerm('');
+      setSearchResults([]);
+      setErrorMsg('');
+      setSuccessMsg('');
+      setInvitedUsers([]);
+    }
   }, [isOpen, projectId, projectName]);
 
   const handleSearch = async () => {
     if (searchTerm.trim().length < 2) {
       setErrorMsg('Introduce al menos 2 caracteres para buscar');
+      setSearchResults([]);
       return;
     }
-
     setLoading(true);
     setErrorMsg('');
     try {
       const results = await searchUsersByName(searchTerm);
-      // Filtrar usuarios ya invitados
       const filteredResults = results.filter(
-        user => !invitedUsers.some(invited => invited.id === user.id)
+        user => !invitedUsers.some(invited => invited.id === user.id) && user.id !== currentUser?.uid
       );
       setSearchResults(filteredResults);
       if (filteredResults.length === 0) {
-        setErrorMsg('No se encontraron usuarios');
+        setErrorMsg('No se encontraron usuarios o ya están invitados.');
       }
     } catch (error) {
       console.error("Error al buscar usuarios:", error);
@@ -56,26 +54,24 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClos
     }
   };
 
-  const handleInvite = async (user) => {
+  const handleInvite = async (userToInvite) => {
+    if (!projectId || !projectName) {
+      setErrorMsg('Error: No se ha especificado el proyecto para la invitación.');
+      return;
+    }
+    setLoading(true);
+    setErrorMsg('');
     try {
-      setLoading(true);
-      setErrorMsg('');
-      
-      // Enviar notificación de invitación
       await createProjectInvitationNotification(
-        user.id,
-        projectId, // Usar prop
-        projectName, // Usar prop
+        userToInvite.id,
+        projectId, // Usar la prop projectId
+        projectName, // Usar la prop projectName
         currentUser.uid,
-        currentUser.displayName || 'Usuario'
+        currentUser.displayName || currentUser.email || 'Un usuario'
       );
-      
-      // Actualizar la UI
-      setInvitedUsers([...invitedUsers, user]);
-      setSearchResults(prev => prev.filter(u => u.id !== user.id));
-      setSuccessMsg(`Invitación enviada a ${user.displayName || user.email}`);
-      
-      // Limpiar mensaje de éxito después de unos segundos
+      setInvitedUsers(prev => [...prev, userToInvite]);
+      setSearchResults(prev => prev.filter(u => u.id !== userToInvite.id));
+      setSuccessMsg(`Invitación enviada a ${userToInvite.displayName || userToInvite.email}`);
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (error) {
       console.error("Error al enviar invitación:", error);
@@ -85,20 +81,21 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClos
     }
   };
 
-  // Verificar que las props están llegando
-  console.log("InviteModal renderizado con:", { isOpen, projectId, projectName });
-  
+  // Si isOpen es falso, no renderizar nada.
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <div className="modal-backdrop"> {/* Solo renderizar si isOpen es true */}
+    <div className="modal-backdrop">
       <div className="invite-modal">
         <div className="modal-header">
           <h2>Invitar colaboradores</h2>
-          {/* Usar la prop onClose */}
+          {/* Asegúrate de que este botón llame a la prop onClose */}
           <button className="close-button" onClick={onClose}>×</button>
         </div>
         
         <div className="modal-body">
-          {/* Usar la prop projectName para mostrar el nombre del proyecto */}
           <p>Proyecto: <strong>{projectName}</strong></p>
           
           <div className="search-container">
@@ -121,16 +118,16 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClos
           {errorMsg && <div className="error-message">{errorMsg}</div>}
           {successMsg && <div className="success-message">{successMsg}</div>}
           
-          <div className="results-container">
-            <h3>Resultados</h3>
-            {searchResults.length > 0 ? (
+          {searchResults.length > 0 && (
+            <div className="results-container">
+              <h3>Resultados de la búsqueda</h3>
               <ul className="user-list">
                 {searchResults.map(user => (
                   <li key={user.id} className="user-item">
                     <div className="user-info">
                       <img 
-                        src={user.photoURL || 'https://via.placeholder.com/40'} 
-                        alt={user.displayName || 'Usuario'} 
+                        src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=random`} 
+                        alt={user.displayName || user.email} 
                         className="user-avatar"
                       />
                       <span className="user-name">{user.displayName || user.email}</span>
@@ -145,21 +142,19 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClos
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p className="no-results">No hay resultados</p>
-            )}
-          </div>
+            </div>
+          )}
           
           {invitedUsers.length > 0 && (
             <div className="invited-container">
-              <h3>Usuarios invitados</h3>
+              <h3>Usuarios ya invitados en esta sesión</h3>
               <ul className="user-list">
                 {invitedUsers.map(user => (
                   <li key={user.id} className="user-item invited">
                     <div className="user-info">
                       <img 
-                        src={user.photoURL || 'https://via.placeholder.com/40'} 
-                        alt={user.displayName || 'Usuario'} 
+                        src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName || user.email}&background=random`} 
+                        alt={user.displayName || user.email} 
                         className="user-avatar"
                       />
                       <span className="user-name">{user.displayName || user.email}</span>
@@ -173,7 +168,7 @@ const InviteModal = ({ isOpen, onClose, projectId, projectName }) => { // onClos
         </div>
         
         <div className="modal-footer">
-          {/* Usar la prop onClose */}
+          {/* Asegúrate de que este botón llame a la prop onClose */}
           <button onClick={onClose} className="cancel-button">
             Cerrar
           </button>
