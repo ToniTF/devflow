@@ -97,8 +97,8 @@ const ProjectCard = ({ project, onInviteClick }) => {
           Solicitud enviada
         </span>
       );
-    } else {
-      // El usuario no es ni creador ni colaborador: mostrar botón Unirse
+    } else if (currentUser) {
+      // El usuario no es ni creador ni colaborador y está logueado: mostrar botón Unirse
       return (
         <button 
           onClick={handleJoinRequest} 
@@ -108,7 +108,8 @@ const ProjectCard = ({ project, onInviteClick }) => {
           {joining ? 'Enviando...' : 'Unirse'}
         </button>
       );
-    }
+    } 
+    // Si no hay currentUser, no mostrar nada en lugar del botón "Unirse"
   };
 
   return (
