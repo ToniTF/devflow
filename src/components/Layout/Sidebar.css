@@ -32,14 +32,23 @@
   margin-bottom: 5px;
 }
 
-.sidebar a {
+/* Estilo para los NavLink dentro de los li */
+.sidebar ul li > a { /* Esto se aplicará a todos los NavLink */
   display: flex;
   align-items: center;
-  padding: 15px 20px;
-  color: #e1e1e1;
+  padding: 10px 15px; /* Ajusta el padding-left según necesites */
   text-decoration: none;
+  color: white; /* Reemplaza con tu color */
   transition: all 0.3s ease;
   border-left: 4px solid transparent;
+}
+
+/* Estilo para los iconos del sidebar */
+.sidebar-icon {
+  margin-right: 10px;  /* Espacio entre el icono y el texto */
+  width: 20px;         /* Ancho fijo para el icono */
+  text-align: center;  /* Para centrar el icono si es más pequeño que su width */
+  flex-shrink: 0;      /* Evita que el icono se encoja */
 }
 
 .sidebar a:hover, 
@@ -47,11 +56,6 @@
   background-color: rgba(255, 255, 255, 0.1);
   color: #4db5ff;
   border-left: 4px solid #4db5ff;
-}
-
-.sidebar-icon {
-  margin-right: 10px;
-  font-size: 1.2rem;
 }
 
 /* Responsive mejorado */

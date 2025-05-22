@@ -48,12 +48,8 @@ const Sidebar = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink 
-                to="/calendar" 
-                className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}
-              >
-                <i className="fas fa-calendar-alt"></i>
-                <span>Calendario</span>
+              <NavLink to="/calendar" activeClassName="active">
+                <i className="fas fa-calendar-alt sidebar-icon"></i> Calendario
               </NavLink>
             </li>
           </>
