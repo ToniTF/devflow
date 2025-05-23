@@ -74,25 +74,6 @@ export const createUserDocument = async (user, additionalData = {}) => {
   return userRef;
 };
 
-// Obtener datos de un usuario por su ID
-export const getUserById = async (userId) => {
-  if (!userId) return null;
-  
-  try {
-    const userRef = doc(db, 'users', userId);
-    const userSnapshot = await getDoc(userRef);
-    
-    if (userSnapshot.exists()) {
-      return { id: userSnapshot.id, ...userSnapshot.data() };
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error('Error al obtener usuario:', error);
-    return null;
-  }
-};
-
 // Buscar usuarios por nombre o nombre de usuario de GitHub
 export const searchUsersByName = async (searchTerm) => {
   if (!searchTerm || searchTerm.length < 2) return [];
@@ -184,5 +165,60 @@ export const getUserWithGitHubData = async (userId) => {
   } catch (error) {
     console.error('Error al obtener datos del usuario:', error);
     return null;
+  }
+};
+
+// Buscar usuarios por nombre o email
+export const searchUsers = async (query) => {
+  try {
+    const usersRef = collection(db, 'users');
+    // Crea una consulta para buscar usuarios cuyo nombre o email contenga la query
+    // Nota: Esto requiere índices en Firebase para funcionar correctamente
+    
+    // Convertir a minúsculas para búsqueda no sensible a mayúsculas
+    const queryLower = query.toLowerCase();
+    
+    // Obtener todos los usuarios y filtrar en el cliente
+    // (No es lo más eficiente pero funciona sin índices complejos)
+    const snapshot = await getDocs(usersRef);
+    
+    const results = [];
+    snapshot.forEach((doc) => {
+      const userData = doc.data();
+      // Verificar si el displayName o email contienen la query
+      if ((userData.displayName && userData.displayName.toLowerCase().includes(queryLower)) || 
+          (userData.email && userData.email.toLowerCase().includes(queryLower))) {
+        results.push({
+          id: doc.id,
+          ...userData
+        });
+      }
+    });
+    
+    return results;
+  } catch (error) {
+    console.error('Error al buscar usuarios:', error);
+    throw error;
+  }
+};
+
+// Obtener datos de un usuario por ID
+export const getUserById = async (userId) => {
+  try {
+    const docRef = doc(db, 'users', userId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return {
+        id: docSnap.id,
+        ...docSnap.data()
+      };
+    } else {
+      console.log('No se encontró el usuario');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error al obtener usuario por ID:', error);
+    throw error;
   }
 };

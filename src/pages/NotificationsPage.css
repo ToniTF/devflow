@@ -221,3 +221,73 @@ button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* Añadir estos estilos */
+.btn-compose {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-compose:hover {
+  background-color: #1e88e5;
+}
+
+.btn-compose::before {
+  content: "+";
+  font-size: 18px;
+}
+
+/* Estilos para el botón de responder */
+.btn-reply {
+  background-color: var(--btn-secondary-bg, #e0e0e0);
+  color: var(--text-primary, #333);
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.btn-reply:hover {
+  background-color: var(--btn-secondary-hover, #d0d0d0);
+}
+
+.btn-reply:active {
+  transform: scale(0.98);
+}
+
+.btn-reply:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ícono de respuesta (opcional) */
+.btn-reply::before {
+  content: "↩";
+  font-size: 14px;
+}
+
+/* Contenedor de acciones para notificaciones */
+.notification-actions {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Si quieres un efecto sutíl cuando se marca como no leído */
+.notification-item.unread .btn-reply {
+  color: var(--primary-color, #1976d2);
+}

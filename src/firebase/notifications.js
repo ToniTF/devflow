@@ -428,3 +428,25 @@ export const rejectJoinRequest = async (notificationId) => {
     throw error;
   }
 };
+
+// Añadir esta función para crear mensajes directos
+
+// Crear mensaje directo a otro usuario
+export const createDirectMessage = async (recipientId, senderId, senderName, subject, message) => {
+  try {
+    return await createNotification({
+      type: 'direct_message',
+      recipientId,
+      senderId,
+      title: subject || `Mensaje de ${senderName}`,
+      message: message,
+      data: {
+        senderName,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error) {
+    console.error('Error al enviar mensaje directo:', error);
+    throw error;
+  }
+};

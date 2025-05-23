@@ -11,6 +11,7 @@ import {
   deleteNotification,
   deleteAllNotifications
 } from '../firebase/notifications';
+import ComposeMessageModal from '../components/Notifications/ComposeMessageModal';
 import './NotificationsPage.css';
 
 const NotificationsPage = () => {
@@ -19,6 +20,8 @@ const NotificationsPage = () => {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState({});
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [showComposeModal, setShowComposeModal] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState(null); // Para almacenar el mensaje seleccionado
 
   useEffect(() => {
     if (!currentUser) return;
@@ -32,15 +35,11 @@ const NotificationsPage = () => {
   }, [currentUser]);
 
   const handleMarkAsRead = async (notificationId) => {
-    // No es necesario verificar 'processing' aquí si la UI ya lo hace antes de llamar
     try {
-      // Optimistamente actualiza la UI si es necesario, aunque el listener debería encargarse
-      // setNotifications(prev => prev.map(n => n.id === notificationId ? {...n, read: true} : n));
       await markAsRead(notificationId);
     } catch (error) {
       console.error('Error al marcar como leída:', error);
     }
-    // No es necesario 'finally' para setProcessing si no se usa aquí
   };
 
   const handleAcceptInvitation = async (notification) => {
@@ -96,8 +95,6 @@ const NotificationsPage = () => {
   };
 
   const handleDeleteNotification = async (notificationId) => {
-    // La confirmación ya está en el JSX si es necesaria, o se puede añadir aquí.
-    // if (window.confirm('¿Estás seguro de eliminar esta notificación?')) { ... }
     if (processing[notificationId]) return;
     try {
       setProcessing(prev => ({ ...prev, [notificationId]: true }));
@@ -123,7 +120,6 @@ const NotificationsPage = () => {
   };
 
   const renderNotification = (notification) => {
-    // console.log('Renderizando notificación:', notification); // Log para ver datos de la notificación
     const isUnread = !notification.read;
     const isProcessed = notification.processed;
     const isCurrentlyProcessing = processing[notification.id]; 
@@ -221,11 +217,27 @@ const NotificationsPage = () => {
               </Link>
             </div>
           )}
+
+          {/* Para mensajes directos, añadir botón de responder */}
+          {notification.type === 'direct_message' && (
+            <div className="notification-actions">
+              <button 
+                className="btn-reply"
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  setSelectedMessage(notification);
+                  setShowComposeModal(true); 
+                }}
+                disabled={isCurrentlyProcessing}
+              >
+                Responder
+              </button>
+            </div>
+          )}
           
           {/* Grupo de acciones para el botón de eliminar individual */}
           {/* Este div siempre debería renderizarse, el botón interior se deshabilita si isCurrentlyProcessing es true */}
           <div className="notification-actions"> 
-            {/* console.log('Renderizando botón eliminar para notif:', notification.id, 'isCurrentlyProcessing:', isCurrentlyProcessing) */}
             <button
               className="btn-delete-notification"
               onClick={(e) => {
@@ -256,9 +268,15 @@ const NotificationsPage = () => {
         <div className="notifications-container">
           <div className="notifications-header-actions">
             <button
+              className="btn-compose"
+              onClick={() => setShowComposeModal(true)}
+            >
+              Nuevo mensaje
+            </button>
+            <button
               className="btn-delete-all"
               onClick={handleDeleteAllNotifications}
-              disabled={isDeletingAll || loading} // Deshabilitar si está cargando notificaciones también
+              disabled={isDeletingAll || loading}
             >
               {isDeletingAll ? 'Eliminando...' : 'Eliminar todas las notificaciones'}
             </button>
@@ -271,6 +289,13 @@ const NotificationsPage = () => {
         <div className="no-notifications">
           <p>No tienes notificaciones</p>
         </div>
+      )}
+
+      {showComposeModal && (
+        <ComposeMessageModal 
+          onClose={() => setShowComposeModal(false)} 
+          initialMessage={selectedMessage} // Pasar el mensaje seleccionado para responder
+        />
       )}
     </div>
   );
