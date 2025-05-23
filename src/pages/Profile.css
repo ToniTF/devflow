@@ -3,12 +3,13 @@
   max-width: 800px;
   margin: 0 auto;
   min-height: calc(100vh - 160px);
+  /* background-color: var(--bg-primary); Ya se hereda del body */
 }
 
 .profile-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px var(--shadow-color);
   padding: 2rem;
 }
 
@@ -24,12 +25,14 @@
   height: 150px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #1a1a2e;
+  border: 4px solid var(--accent-color); /* Usar accent-color para el borde del avatar */
   margin-bottom: 1rem;
 }
 
+/* h1 para el nombre de usuario ya hereda color de var(--text-primary) desde styles.css */
+
 .profile-email {
-  color: #666;
+  color: var(--text-secondary);
   margin: 0.5rem 0;
 }
 
@@ -37,11 +40,23 @@
   margin-bottom: 2rem;
 }
 
+/* .info-item strong ya hereda color de var(--text-primary) */
+/* .info-item span (si se usa para el valor) debería heredar var(--text-secondary) o var(--text-primary) según el diseño */
+
 .info-item {
   display: flex;
   justify-content: space-between;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary); /* Asegurar que el texto dentro del item use el color primario */
+}
+
+.info-item strong { /* Para asegurar que el texto "strong" también tome el color primario */
+    color: var(--text-primary);
+}
+
+.info-item span { /* Para el valor del item, si es diferente del strong */
+    color: var(--text-secondary);
 }
 
 .info-item:last-child {
@@ -53,22 +68,18 @@
   justify-content: center;
 }
 
-.btn-danger {
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 0.8rem 1.8rem;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+/* El botón .btn-danger ya está estilizado en styles.css usando variables */
+/* Si necesitas anular algo específicamente aquí, puedes hacerlo, pero idealmente debería heredar */
+/* Por ejemplo, si el padding o font-weight es diferente SÓLO en esta página: */
+.profile-actions .btn-danger {
+  /* background-color: var(--btn-danger-bg); Ya heredado */
+  /* color: var(--btn-danger-text); Ya heredado */
+  /* border: none; Ya heredado */
+  padding: 0.8rem 1.8rem; /* Mantener padding específico si es necesario */
+  border-radius: 4px; /* Mantener border-radius específico si es necesario */
+  font-weight: 600; /* Mantener font-weight específico si es necesario */
+  /* cursor: pointer; Ya heredado */
+  /* transition: background-color 0.3s ease; La transición general del tema ya podría cubrir esto */
 }
 
-.btn-danger:hover {
-  background-color: #c82333;
-}
-
-.btn-danger:disabled {
-  background-color: #b0b0b0;
-  cursor: not-allowed;
-}
+/* .btn-danger:hover y .btn-danger:disabled ya están cubiertos en styles.css */
