@@ -204,21 +204,29 @@ export const searchUsers = async (query) => {
 
 // Obtener datos de un usuario por ID
 export const getUserById = async (userId) => {
+  if (!userId) {
+    console.error('Error: getUserById llamado sin ID de usuario');
+    return null;
+  }
+  
   try {
+    console.log('Buscando usuario con ID:', userId);
     const docRef = doc(db, 'users', userId);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      return {
+      const userData = {
         id: docSnap.id,
         ...docSnap.data()
       };
+      console.log('Usuario encontrado:', userData);
+      return userData;
     } else {
-      console.log('No se encontró el usuario');
+      console.log('No se encontró el usuario con ID:', userId);
       return null;
     }
   } catch (error) {
     console.error('Error al obtener usuario por ID:', error);
-    throw error;
+    return null;
   }
 };

@@ -15,6 +15,58 @@ const ComposeMessageModal = ({ onClose, selectedMessage }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  // Preseleccionar al remitente cuando estamos respondiendo a un mensaje
+  useEffect(() => {
+    console.log('selectedMessage recibido:', selectedMessage);
+    
+    if (selectedMessage) {
+      // Verificar que tenemos la información requerida
+      console.log('Tipo:', selectedMessage.type);
+      console.log('senderId:', selectedMessage.senderId);
+      console.log('Título:', selectedMessage.title);
+      
+      if (selectedMessage.type === 'direct_message') {
+        // Obtener y establecer el remitente como destinatario
+        const loadSender = async () => {
+          try {
+            const senderId = selectedMessage.senderId || 
+                            (selectedMessage.data && selectedMessage.data.senderId);
+            
+            if (!senderId) {
+              console.error('No se encontró ID del remitente en la notificación');
+              return;
+            }
+            
+            console.log('Intentando cargar usuario con ID:', senderId);
+            const senderData = await getUserById(senderId);
+            
+            if (senderData) {
+              console.log('Datos del remitente obtenidos:', senderData);
+              setSelectedRecipient({
+                id: senderData.id,
+                displayName: senderData.displayName || senderData.email
+              });
+              setRecipientSearch(senderData.displayName || senderData.email);
+              
+              if (selectedMessage.title) {
+                const title = selectedMessage.title;
+                const newSubject = title.startsWith('Re:') ? title : `Re: ${title}`;
+                setSubject(newSubject);
+                console.log('Asunto establecido:', newSubject);
+              }
+            } else {
+              console.error('No se pudieron obtener datos del remitente');
+            }
+          } catch (error) {
+            console.error('Error al cargar el remitente:', error);
+          }
+        };
+        
+        loadSender();
+      }
+    }
+  }, [selectedMessage]);
+
   // Buscar usuarios mientras se escribe
   const handleSearch = async (e) => {
     const query = e.target.value;
@@ -78,34 +130,6 @@ const ComposeMessageModal = ({ onClose, selectedMessage }) => {
       setLoading(false);
     }
   };
-
-  // Pre-rellenar campos si estamos respondiendo a un mensaje
-  useEffect(() => {
-    if (selectedMessage && selectedMessage.type === 'direct_message') {
-      const getUserData = async () => {
-        try {
-          // Obtener datos del remitente original para responder
-          const senderData = await getUserById(selectedMessage.senderId);
-          if (senderData) {
-            setSelectedRecipient(senderData);
-            setRecipientSearch(senderData.displayName || senderData.email);
-            
-            // Pre-rellenar asunto con "Re: " si no lo tiene ya
-            const originalSubject = selectedMessage.title || '';
-            if (!originalSubject.startsWith('Re: ')) {
-              setSubject(`Re: ${originalSubject}`);
-            } else {
-              setSubject(originalSubject);
-            }
-          }
-        } catch (error) {
-          console.error('Error al obtener datos del remitente:', error);
-        }
-      };
-      
-      getUserData();
-    }
-  }, [selectedMessage]);
 
   return (
     <div className="modal-overlay">

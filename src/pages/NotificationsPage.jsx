@@ -231,8 +231,19 @@ const NotificationsPage = () => {
               <button 
                 className="btn-reply"
                 onClick={(e) => { 
-                  e.stopPropagation(); 
-                  setSelectedMessage(notification);
+                  e.stopPropagation();
+                  // Incluye toda la información necesaria del remitente
+                  console.log('Datos de notificación para respuesta:', {
+                    id: notification.id,
+                    senderId: notification.senderId || notification.data?.senderId,
+                    title: notification.title,
+                    data: notification.data
+                  });
+                  setSelectedMessage({
+                    ...notification,
+                    senderId: notification.senderId || notification.data?.senderId,
+                    type: 'direct_message'
+                  });
                   setShowComposeModal(true); 
                 }}
                 disabled={isCurrentlyProcessing}
@@ -300,8 +311,11 @@ const NotificationsPage = () => {
 
       {showComposeModal && (
         <ComposeMessageModal 
-          onClose={() => setShowComposeModal(false)} 
-          initialMessage={selectedMessage} // Pasar el mensaje seleccionado para responder
+          onClose={() => {
+            setShowComposeModal(false);
+            setSelectedMessage(null); // Limpia la selección al cerrar
+          }} 
+          selectedMessage={selectedMessage}
         />
       )}
     </div>
