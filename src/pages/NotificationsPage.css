@@ -247,9 +247,9 @@ button:disabled {
 
 /* Estilos para el botón de responder */
 .btn-reply {
-  background-color: var(--btn-secondary-bg, #e0e0e0);
+  background-color: var(--bg-primary, #fff);
   color: var(--text-primary, #333);
-  border: none;
+  border: 1px solid var(--btn-primary-bg, #1976d2); /* Borde azul como los botones principales */
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
@@ -262,7 +262,7 @@ button:disabled {
 }
 
 .btn-reply:hover {
-  background-color: var(--btn-secondary-hover, #d0d0d0);
+  background-color: rgba(25, 118, 210, 0.08); /* Fondo azul sutil al pasar el ratón */
 }
 
 .btn-reply:active {
@@ -272,6 +272,7 @@ button:disabled {
 .btn-reply:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  border-color: var(--border-color, #ccc);
 }
 
 /* Ícono de respuesta (opcional) */
