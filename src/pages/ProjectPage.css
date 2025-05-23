@@ -325,3 +325,185 @@
     padding: 1rem;
   }
 }
+
+/* Estilos para las columnas de tareas (Kanban) */
+.tasks-kanban-board {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto; /* Permitir scroll horizontal si hay muchas columnas */
+  padding-bottom: 1rem; /* Espacio para la barra de scroll */
+}
+
+.task-column {
+  background-color: var(--bg-secondary); /* Fondo ligeramente diferente para las columnas */
+  border-radius: 8px;
+  padding: 1rem;
+  min-width: 300px; /* Ancho mínimo para cada columna */
+  box-shadow: 0 1px 3px var(--shadow-color);
+}
+
+.task-column h3 {
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.task-list {
+  min-height: 100px; /* Para que las zonas de drop se vean bien */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-card {
+  background-color: var(--card-bg);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 1px 2px var(--shadow-color);
+  border: 1px solid var(--border-color);
+  cursor: grab;
+}
+
+.task-card:hover {
+  border-color: var(--accent-color);
+}
+
+.task-card h4 {
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+}
+
+.task-card p {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin: 0 0 0.5rem 0;
+  white-space: pre-wrap; /* Para respetar saltos de línea en descripción */
+}
+
+.task-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.task-priority {
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.task-priority.High { background-color: rgba(220, 53, 69, 0.2); color: var(--btn-danger-bg); }
+.task-priority.Medium { background-color: rgba(255, 193, 7, 0.2); color: #ffc107; }
+.task-priority.Low { background-color: rgba(40, 167, 69, 0.2); color: #28a745; }
+
+
+/* Estilos para el botón de añadir tarea y modal */
+.add-task-btn {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem; /* Espacio después de la lista de tareas */
+}
+
+.add-task-btn:hover {
+  background-color: var(--accent-color);
+}
+
+/* Si el modal de creación de tareas usa el .modal-content genérico de styles.css, ya está cubierto. */
+/* Si tiene clases específicas, por ejemplo .create-task-modal-content: */
+.create-task-modal-content { /* O el nombre de clase que use tu modal específico */
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  color: var(--text-primary);
+}
+
+.create-task-modal-content h2 {
+  color: var(--text-primary);
+  margin-top: 0;
+}
+
+.create-task-modal-content .form-group label {
+  color: var(--text-primary);
+}
+
+.create-task-modal-content .form-group input,
+.create-task-modal-content .form-group textarea,
+.create-task-modal-content .form-group select {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+.create-task-modal-content .form-group input:focus,
+.create-task-modal-content .form-group textarea:focus,
+.create-task-modal-content .form-group select:focus {
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+/* Estilos para el menú de acciones en TaskCard */
+.task-card .task-actions {
+  position: relative; /* Para posicionar el dropdown */
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end; /* Alinea el botón del menú a la derecha */
+}
+
+.task-action-menu-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.2rem; /* Tamaño del icono de tres puntos */
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.task-action-menu-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.task-action-dropdown {
+  position: absolute;
+  top: 100%; /* Debajo del botón */
+  right: 0; /* Alineado a la derecha del botón */
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+  z-index: 10; /* Para que esté sobre otras tarjetas */
+  min-width: 150px; /* Ancho mínimo del menú */
+  padding: 0.5rem 0;
+}
+
+.task-action-dropdown button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.task-action-dropdown button:hover {
+  background-color: var(--bg-secondary);
+  color: var(--accent-color);
+}
