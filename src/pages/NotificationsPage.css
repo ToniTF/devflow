@@ -293,3 +293,15 @@ button:disabled {
 .notification-item.unread .btn-reply {
   color: var(--primary-color, #1976d2);
 }
+
+/* Estilo para mostrar el remitente de mensajes */
+.notification-sender {
+  font-size: 0.9rem;
+  margin-top: 4px;
+  color: var(--text-secondary, #666);
+}
+
+.notification-sender span {
+  font-weight: 600;
+  color: var(--primary-color, #1976d2);
+}

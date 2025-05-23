@@ -147,6 +147,13 @@ const NotificationsPage = () => {
           <p>{notification.message}</p>
           <div className="notification-time">{formattedDate}</div>
           
+          {/* Mostrar el remitente solo para mensajes directos */}
+          {notification.type === 'direct_message' && notification.data?.senderName && (
+            <div className="notification-sender">
+              De: <span>{notification.data.senderName}</span>
+            </div>
+          )}
+          
           {notification.processed && notification.status === 'accepted' && (
             <div className="notification-status accepted">
               ✓ Invitación aceptada
