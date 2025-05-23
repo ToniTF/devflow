@@ -54,9 +54,13 @@ body {
   cursor: pointer;
   font-size: 1.5rem;
   color: var(--text-primary);
-  padding: 8px;
+  padding: 8px; /* Padding interno para el área clickeable */
   border-radius: 50%;
   transition: all 0.3s ease;
+  margin: 0; /* Asegurar que no haya márgenes externos */
+  display: inline-flex; /* Para un buen comportamiento de alineación y tamaño */
+  align-items: center;
+  justify-content: center;
 }
 
 .theme-toggle:hover {

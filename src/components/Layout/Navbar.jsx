@@ -44,16 +44,16 @@ const Navbar = ({ onToggleSidebar }) => {
                             Contactos
                         </Link>
                         <NotificationBell />
+                        {/* Elementos ahora como hijos directos de navbar-links */}
                         <Link to="/profile" className="user-menu-link">
-                            <div className="user-menu">
-                                <img 
-                                    src={currentUser.photoURL || 'https://via.placeholder.com/35'} 
-                                    alt="Avatar" 
-                                    className="user-avatar" 
-                                />
-                            </div>
+                            {/* Se elimina el div.user-menu, la imagen es hija directa del Link */}
+                            <img 
+                                src={currentUser.photoURL || 'https://via.placeholder.com/35'} 
+                                alt="Avatar" 
+                                className="user-avatar" 
+                            />
                         </Link>
-                        <ThemeToggle /> {/* Añadir el botón de cambio de tema */}
+                        <ThemeToggle /> 
                     </>
                 ) : (
                     <Link to="/login" className="nav-link auth-button">

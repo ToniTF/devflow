@@ -40,7 +40,7 @@
 
 .navbar-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem; /* Espaciado uniforme para todos los elementos */
   align-items: center;
 }
 
@@ -49,7 +49,7 @@
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
-  padding: 0.5rem 0;
+  padding: 0.5rem 0; /* Padding vertical para los enlaces de texto */
 }
 
 .nav-link:hover,
@@ -57,19 +57,24 @@
   color: #4db5ff;
 }
 
-.user-menu {
-  position: relative;
-  display: flex;
+/* Ajustes específicos para el link del avatar (solucionar espaciado) */
+.user-menu-link {
+  text-decoration: none;
+  display: inline-flex; /* Fundamental: ajusta el contenedor al tamaño del avatar */
   align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
+  padding: 0; /* Elimina cualquier padding */
+  line-height: 0; /* Elimina el line-height que puede causar espacios extra */
+  width: 35px; /* Forzar que el ancho sea exactamente el ancho del avatar */
+  height: 35px; /* Forzar que la altura sea exactamente la altura del avatar */
 }
 
+/* Estilos para la imagen del avatar */
 .user-avatar {
   width: 35px;
   height: 35px;
   border-radius: 50%;
   object-fit: cover;
+  display: block; /* Elimina espacios debajo de la imagen */
 }
 
 /* Estilos para el botón de hamburguesa (galleta) */
@@ -121,9 +126,8 @@
      Asegúrate que .navbar-links (el contenedor) siga siendo flex para alinear estos ítems.
   */
   .navbar-links {
-    /* display: flex; ya está definido globalmente y se hereda */
-    /* gap: 1.5rem; ya está definido globalmente, ajusta si es necesario para móvil */
-    gap: 0.75rem; /* Ejemplo de gap reducido para móvil */
+    /* Ajusta el gap para móviles si es necesario, manteniendo la uniformidad */
+    gap: 0.75rem; 
   }
   
   .navbar-logo h1 {
@@ -144,14 +148,4 @@
 
 .auth-button:hover {
   background-color: #1a1f23;
-}
-
-.user-menu-link {
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-}
-
-.user-menu-link:hover {
-  text-decoration: none;
 }
