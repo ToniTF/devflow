@@ -1,9 +1,17 @@
 .task-form-container {
-  background: white;
+  background: var(--card-bg); /* Usar variable para el fondo */
   padding: 1.5rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px var(--shadow-color); /* Usar variable para la sombra */
   margin-bottom: 2rem;
+}
+
+/* Estilo para el título del formulario si existe dentro de este contenedor */
+.task-form-container h3 {
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .task-form {
@@ -15,12 +23,12 @@
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.5rem; /* Mantenido de la versión anterior, ajustar si es necesario */
 }
 
 .form-group label {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary); /* Usar variable para el color de la etiqueta */
   font-size: 0.95rem;
 }
 
@@ -28,17 +36,22 @@
 .form-group textarea,
 .form-group select {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color); /* Usar variable para el borde */
   border-radius: 4px;
   font-size: 1rem;
+  background-color: var(--input-bg); /* Usar variable para el fondo del input */
+  color: var(--text-primary); /* Usar variable para el color del texto del input */
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #4db5ff;
-  box-shadow: 0 0 0 2px rgba(77, 181, 255, 0.2);
+  border-color: var(--accent-color); /* Usar variable para el color del borde en focus */
+  /* Para el box-shadow, si --accent-color-rgb está definido en theme.css, se puede usar: */
+  /* box-shadow: 0 0 0 2px rgba(var(--accent-color-rgb), 0.25); */
+  /* Si no, un color genérico o sin box-shadow específico para el tema oscuro */
+  box-shadow: 0 0 0 2px rgba(77, 181, 255, 0.2); /* Mantener el original si --accent-color-rgb no está disponible o es complejo */
 }
 
 .form-row {
@@ -48,6 +61,7 @@
 
 .form-row .form-group {
   flex: 1;
+  /* margin-bottom: 0; // Quitar si no es necesario, ya que .form-group tiene gap */
 }
 
 .form-actions {
@@ -55,4 +69,17 @@
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+/* Los botones .btn-primary y .btn-secondary ya deberían estar estilizados globalmente */
+/* Si hay un mensaje de error específico para este formulario: */
+.task-form .error-message {
+  background-color: rgba(var(--btn-danger-rgb, 220, 53, 69), 0.1); /* Necesita --btn-danger-rgb */
+  color: var(--btn-danger-bg);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem; /* O margin-top si va antes del form */
+  text-align: center;
+  font-size: 0.9rem;
+  border: 1px solid var(--btn-danger-bg);
 }
