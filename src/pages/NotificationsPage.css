@@ -182,6 +182,7 @@
   border-bottom: 1px solid #eee;
   display: flex;
   justify-content: flex-end;
+  gap: 15px; /* Añadir espacio entre los botones */
 }
 
 /* Botón para eliminar todas las notificaciones */
