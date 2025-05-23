@@ -1,7 +1,8 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
     overflow-x: hidden; /* Prevenir scroll horizontal en toda la página */
     box-sizing: border-box; /* Aplicar box-sizing globalmente */
 }
@@ -11,12 +12,12 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #333;
+    color: var(--text-primary);
 }
 
 a {
     text-decoration: none;
-    color: #007bff;
+    color: var(--accent-color);
 }
 
 a:hover {
@@ -34,8 +35,8 @@ a:hover {
 .btn {
     display: inline-block;
     font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
+    color: var(--btn-primary-text);
+    background-color: var(--btn-primary-bg);
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
@@ -43,14 +44,14 @@ a:hover {
 }
 
 .btn:hover {
-    background-color: #0056b3;
+    background-color: var(--accent-color);
 }
 
 /* Estilos para el botón de peligro (rojo) */
 .btn.btn-danger, /* Hacerlo un poco más específico para asegurar la anulación */
 .btn-danger {     /* O simplemente .btn-danger si el orden es suficiente */
-  background-color: #dc3545;
-  color: white;
+  background-color: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
   /* Puedes decidir si quieres que herede el padding de .btn o use el suyo propio. */
   /* Si quieres el padding específico de btn-danger: */
   padding: 0.5rem 1rem; /* Aprox. 8px 16px si 1rem = 16px */
@@ -60,7 +61,8 @@ a:hover {
 
 .btn.btn-danger:hover,
 .btn-danger:hover {
-  background-color: #c82333;
+  background-color: var(--btn-danger-bg);
+  filter: brightness(90%);
 }
 
 .btn.btn-danger:disabled,
@@ -73,16 +75,17 @@ a:hover {
 
 /* Estilos para el botón de eliminar (variante de btn) */
 .btn.btn-delete { /* Selector más específico */
-  background-color: #ffebee; /* Fondo rojo claro, como en TaskItem.css */
-  color: #c62828;    /* Color de texto rojo oscuro, como en TaskItem.css */
+  background-color: var(--bg-secondary);
+  color: var(--btn-danger-bg);
   /* Hereda padding, font-size, etc., de .btn y .btn-sm */
   /* Si necesitas un borde específico, añádelo aquí */
   /* border: 1px solid #c62828; */
 }
 
 .btn.btn-delete:hover {
-  background-color: #ffcdd2; /* Un rojo un poco más oscuro para el hover */
-  color: #b71c1c;
+  background-color: var(--bg-secondary);
+  color: var(--btn-danger-bg);
+  filter: brightness(90%);
 }
 
 .modal {
@@ -99,17 +102,18 @@ a:hover {
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: var(--card-bg);
     margin: 15% auto;
     padding: 20px;
-    border: 1px solid #888;
-    width: 90%; /* Cambiado de 80% a 90% */
-    max-width: 600px; /* Añadido un ancho máximo */
+    border: 1px solid var(--border-color);
+    width: 90%;
+    max-width: 600px;
+    color: var(--text-primary);
 }
 
 .loader {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
+    border: 8px solid var(--bg-secondary);
+    border-top: 8px solid var(--accent-color);
     border-radius: 50%;
     width: 60px;
     height: 60px;
@@ -139,6 +143,7 @@ a:hover {
   max-width: calc(100% - 200px); /* Asegurar que no exceda el ancho disponible */
   overflow-x: hidden; /* Evitar scroll horizontal */
   box-sizing: border-box; /* Incluir padding en el ancho */
+  background-color: var(--bg-primary);
 }
 
 /* Estilos responsive mejorados */

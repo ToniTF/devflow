@@ -43,9 +43,9 @@
   top: 100%;
   right: 0;
   width: 320px;
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px var(--shadow-color);
   z-index: 1000;
   overflow: hidden;
   margin-top: 10px;
@@ -56,18 +56,19 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .notification-header h3 {
   margin: 0;
   font-size: 1rem;
+  color: var(--text-primary);
 }
 
 .mark-all-read {
   background: none;
   border: none;
-  color: #1976d2;
+  color: var(--accent-color);
   cursor: pointer;
   font-size: 0.85rem;
   padding: 4px 8px;
@@ -75,7 +76,7 @@
 }
 
 .mark-all-read:hover {
-  background-color: rgba(25, 118, 210, 0.08);
+  background-color: var(--bg-secondary);
 }
 
 .notification-dropdown-content {
@@ -84,12 +85,12 @@
 
 .no-notifications {
   text-align: center;
-  color: #888;
+  color: var(--text-secondary);
   margin: 20px 0;
 }
 
 .notification-summary {
-  color: #555;
+  color: var(--text-secondary);
   margin-bottom: 20px;
 }
 
@@ -97,15 +98,16 @@
   display: block;
   text-align: center;
   padding: 10px;
-  background-color: #f5f5f5;
+  background-color: var(--bg-secondary);
   border-radius: 4px;
-  color: #333;
+  color: var(--text-primary);
   text-decoration: none;
   margin-top: 10px;
 }
 
 .view-all-link:hover {
-  background-color: #e8e8e8;
+  background-color: var(--bg-secondary);
+  filter: brightness(90%);
 }
 
 /* filepath: c:\xampp\htdocs\devflow\devflow\src\components\Notifications\NotificationBell.css */

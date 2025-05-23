@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import './Navbar.css';
 import NotificationBell from '../Notifications/NotificationBell';
+import ThemeToggle from './ThemeToggle'; // Importar el componente
 
 // Opcional: si usas iconos de una librería, impórtalos. Ej: import { FaBars } from 'react-icons/fa';
 
@@ -52,6 +53,7 @@ const Navbar = ({ onToggleSidebar }) => {
                                 />
                             </div>
                         </Link>
+                        <ThemeToggle /> {/* Añadir el botón de cambio de tema */}
                     </>
                 ) : (
                     <Link to="/login" className="nav-link auth-button">

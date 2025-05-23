@@ -10,9 +10,9 @@
 .dashboard-unauthorized {
   text-align: center;
   padding: 3rem;
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px var(--shadow-color);
 }
 
 .dashboard-header {
@@ -35,7 +35,8 @@
 
 .filter-buttons button {
   padding: 0.5rem 1rem;
-  background: #f1f1f1;
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -43,8 +44,8 @@
 }
 
 .filter-buttons button.active {
-  background: #1a1a2e;
-  color: white;
+  background: var(--accent-color);
+  color: var(--btn-primary-text);
 }
 
 .projects-grid {
@@ -54,9 +55,9 @@
 }
 
 .project-card {
-  background: white;
+  background: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px var(--shadow-color);
   padding: 1.5rem;
   transition: transform 0.3s ease;
 }
@@ -71,7 +72,7 @@
   gap: 0.5rem;
   margin: 1rem 0;
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .project-creator {
@@ -81,7 +82,7 @@
 }
 
 .project-description {
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 1rem;
   font-size: 0.95rem;
   line-height: 1.5;
@@ -104,11 +105,11 @@
 }
 
 .collaborator-tag {
-  background-color: #e1f5fe;
+  background-color: var(--bg-secondary);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.8rem;
-  color: #0277bd;
+  color: var(--accent-color);
 }
 
 .project-tags {
@@ -119,18 +120,18 @@
 }
 
 .project-tag {
-  background-color: #f0f0f0;
+  background-color: var(--bg-secondary);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.8rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .no-projects {
   grid-column: 1 / -1;
   text-align: center;
   padding: 3rem;
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
 }
 
@@ -138,7 +139,7 @@
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .project-actions {
@@ -174,22 +175,22 @@
 }
 
 .join-message.success {
-  background-color: #e8f5e9;
+  background-color: var(--bg-secondary);
   color: #2e7d32;
   border-left: 4px solid #4caf50;
 }
 
 .join-message.error {
-  background-color: #ffebee;
-  color: #c62828;
-  border-left: 4px solid #f44336;
+  background-color: var(--bg-secondary);
+  color: var(--btn-danger-text);
+  border-left: 4px solid var(--btn-danger-bg);
 }
 
 /* Añade estos estilos al archivo CSS del Dashboard */
 
 .login-banner {
-  background-color: #f0f7ff;
-  border: 1px solid #cce5ff;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 2rem;

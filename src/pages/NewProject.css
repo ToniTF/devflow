@@ -2,14 +2,14 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px var(--shadow-color);
 }
 
 .new-project-container h1 {
   margin-bottom: 1.5rem;
-  color: #1a1a2e;
+  color: var(--text-primary);
 }
 
 .new-project-form {
@@ -26,21 +26,23 @@
 
 .form-group label {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .form-group input,
 .form-group textarea {
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 1rem;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #4db5ff;
+  border-color: var(--accent-color);
   box-shadow: 0 0 0 2px rgba(77, 181, 255, 0.2);
 }
 
@@ -60,23 +62,23 @@
 }
 
 .btn-primary {
-  background-color: #4db5ff;
-  color: white;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   border: none;
 }
 
 .btn-secondary {
-  background-color: white;
-  color: #333;
-  border: 1px solid #ddd;
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--border-color);
 }
 
 .btn-primary:hover {
-  background-color: #3a9bd8;
+  background-color: var(--accent-color);
 }
 
 .btn-secondary:hover {
-  background-color: #f5f5f5;
+  background-color: var(--bg-secondary);
 }
 
 .btn:disabled {
@@ -85,8 +87,8 @@
 }
 
 .error-message {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: var(--bg-secondary);
+  color: var(--btn-danger-bg);
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1.5rem;

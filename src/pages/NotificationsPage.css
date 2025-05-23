@@ -6,7 +6,7 @@
 
 .notifications-page h1 {
   margin-bottom: 2rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .loading {
@@ -14,13 +14,13 @@
   justify-content: center;
   align-items: center;
   height: 200px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .notifications-container {
-  background-color: white;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 10px var(--shadow-color);
   overflow: hidden;
 }
 
@@ -31,7 +31,7 @@
 
 .notification-item {
   padding: 1.5rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
   transition: background-color 0.2s;
   /* cursor: pointer; Ya no es necesario en todo el item si hay botones específicos */
   display: flex; /* Para alinear contenido y grupo de acciones */
@@ -44,15 +44,16 @@
 }
 
 .notification-item:hover {
-  background-color: #fafafa;
+  background-color: var(--bg-secondary);
 }
 
 .notification-item.unread {
-  background-color: #f0f7ff;
+  background-color: var(--bg-secondary);
 }
 
 .notification-item.unread:hover {
-  background-color: #e6f0ff;
+  background-color: var(--bg-secondary);
+  filter: brightness(95%);
 }
 
 .notification-item.processed {
@@ -61,18 +62,18 @@
 
 .notification-content h4 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .notification-content p {
   margin: 0 0 0.5rem 0;
-  color: #555;
+  color: var(--text-secondary);
   max-width: 90%; /* Evitar que el texto empuje los botones */
 }
 
 .notification-time {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .notification-status {
@@ -84,13 +85,13 @@
 }
 
 .notification-status.accepted {
-  background-color: #e8f5e9;
+  background-color: var(--bg-secondary);
   color: #2e7d32;
 }
 
 .notification-status.rejected {
-  background-color: #ffebee;
-  color: #c62828;
+  background-color: var(--bg-secondary);
+  color: var(--btn-danger-bg);
 }
 
 .notification-actions {
@@ -129,8 +130,8 @@
 }
 
 .btn-reject {
-  background-color: #f5f5f5;
-  color: #555;
+  background-color: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
 }
 
 .btn-reject:hover {
@@ -138,8 +139,8 @@
 }
 
 .btn-view-project {
-  background-color: #2196f3;
-  color: white;
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   text-decoration: none;
   display: inline-block;
   text-align: center;
@@ -151,9 +152,9 @@
 
 /* Botón para eliminar notificación individual */
 .btn-delete-notification {
-  background-color: transparent; /* Fondo transparente */
-  border: 1px solid #dc3545; /* Borde rojo */
-  color: #dc3545; /* Texto rojo */
+  background-color: transparent;
+  border: 1px solid var(--btn-danger-bg);
+  color: var(--btn-danger-bg);
   cursor: pointer;
   font-size: 0.85rem; /* Ajustar tamaño de fuente según sea necesario */
   padding: 0.3rem 0.7rem; /* Ajustar padding */
@@ -163,14 +164,14 @@
 }
 
 .btn-delete-notification:hover {
-  background-color: rgba(220, 53, 69, 0.1); /* Fondo rojo muy sutil al pasar el mouse */
-  color: #c82333; /* Texto rojo más oscuro */
-  border-color: #c82333; /* Borde rojo más oscuro */
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--btn-danger-bg);
+  border-color: var(--btn-danger-bg);
 }
 
 .btn-delete-notification:disabled {
-  color: #aaa;
-  border-color: #ccc;
+  color: var(--text-secondary);
+  border-color: var(--border-color);
   background-color: transparent;
   cursor: not-allowed;
 }
@@ -185,8 +186,8 @@
 
 /* Botón para eliminar todas las notificaciones */
 .btn-delete-all {
-  background-color: #dc3545;
-  color: white;
+  background-color: var(--btn-danger-bg);
+  color: var(--btn-danger-text);
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 4px;
@@ -205,14 +206,14 @@
 }
 
 .no-notifications {
-  background-color: #f9f9f9;
+  background-color: var(--bg-secondary);
   padding: 3rem;
   text-align: center;
   border-radius: 8px;
 }
 
 .no-notifications p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 1.1rem;
 }
 

@@ -1,0 +1,38 @@
+.profile-card {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.profile-card h2 {
+  color: var(--text-primary);
+  margin-top: 0;
+}
+
+.profile-info {
+  color: var(--text-primary);
+}
+
+.profile-info .user-email,
+.profile-info .user-details {
+  color: var(--text-secondary);
+}
+
+.profile-avatar {
+  border: 3px solid var(--accent-color);
+}
+
+.profile-stats {
+  background-color: var(--bg-secondary);
+}
+
+.profile-actions button {
+  background-color: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+}
+
+.profile-actions button:hover {
+  background-color: var(--accent-color);
+}

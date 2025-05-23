@@ -13,6 +13,7 @@
   margin-bottom: 2rem;
   flex-wrap: wrap;
   gap: 1rem;
+  color: var(--text-primary);
 }
 
 .contacts-search {
@@ -23,14 +24,16 @@
 .search-input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.3s;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
 }
 
 .search-input:focus {
-  border-color: #4db5ff;
+  border-color: var(--accent-color);
   outline: none;
 }
 
@@ -41,9 +44,9 @@
 }
 
 .contact-card {
-  background-color: #ffffff;
+  background-color: var(--card-bg);
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px var(--shadow-color);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -52,7 +55,7 @@
 
 .contact-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-color);
 }
 
 .contact-avatar {
@@ -72,8 +75,8 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: #e0e0e0;
-  color: #555;
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,13 +91,13 @@
 
 .contact-info h3 {
   margin: 0 0 0.5rem;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .contact-email, 
 .contact-github {
   margin: 0.25rem 0;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
@@ -112,9 +115,9 @@
 }
 
 .btn-invite {
-  background-color: white;
-  border: 1px solid #1976d2;
-  color: #1976d2;
+  background-color: var(--card-bg);
+  border: 1px solid var(--accent-color);
+  color: var(--accent-color);
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
@@ -125,15 +128,15 @@
 }
 
 .btn-invite:hover {
-  background-color: #f5f9ff;
+  background-color: var(--bg-secondary);
 }
 
 .no-contacts {
   text-align: center;
   padding: 3rem;
-  background-color: #f8f9fa;
+  background-color: var(--bg-secondary);
   border-radius: 8px;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .loading, 
@@ -141,10 +144,11 @@
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
+  color: var(--text-secondary);
 }
 
 .error-message {
-  color: #c62828;
+  color: var(--btn-danger-bg);
 }
 
 /* Estilos responsive */
